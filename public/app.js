@@ -1,3 +1,6 @@
+ఇదిగో మొత్తం app.js కోడ్ కాపీ చేసి పేస్ట్ చేసుకోవడానికి:
+
+```javascript
 const $=s=>document.querySelector(s);
 const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'₹'+(Number(n||0)/100).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -5,7 +8,7 @@ const date=n=>new Date(n).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateSt
 const icons={home:'⌂',games:'♠',wallet:'₹',support:'◉',tournaments:'🏆',menu:'☰',back:'←',close:'×',rotate:'⟳',logout:'↪'};
 const state={user:null,config:null,page:'home',mode:'point101',tables:[],game:null,selected:[],manual:false,wallet:null,history:[],admin:null,adminTab:'overview',signup:null,delivery:null,modal:null,busy:false,tourDate:'today',tourList:null,tourDetail:null,tourId:null,boardPage:0,tourAdmin:null};
 const adminRoute=location.pathname==='/admin';
-async function api(url,data){const r=await fetch(url,{method:data===undefined?'GET':'POST',credentials:'same-origin',headers:data===undefined?{}:{'Content-Type':'application/json','X-Play-Rummy':'1'},body:data===undefined?undefined:JSON.stringify(data)});const v=await r.json();if(!r.ok){if(r.status===401&&state.user){state.user=null;state.game=null;state.modal=null;$('#modal-root').innerHTML='';state.page='home';render();}throw Error(v.error||'Request failed.');}return v;}
+async function api(url,data){const r=await fetch(url,{method:data===undefined?'GET':'POST',credentials:'same-origin',headers:{'X-Area':adminRoute?'admin':'customer',...(data===undefined?{}:{'Content-Type':'application/json','X-Play-Rummy':'1'})},body:data===undefined?undefined:JSON.stringify(data)});const v=await r.json();if(!r.ok){if(r.status===401&&state.user){state.user=null;state.game=null;state.modal=null;$('#modal-root').innerHTML='';state.page='home';render();}throw Error(v.error||'Request failed.');}return v;}
 let toastTimer;
 function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),5000);}
 function button(label,action,extra='',kind='primary'){return `<button class="${kind}" data-action="${action}" ${extra}>${label}</button>`;}
@@ -136,3 +139,6 @@ if(state.user?.mustChange){render();showModal('Change Temporary Password',passwo
 else if(state.user&&adminRoute){await loadAdmin();render();}else if(state.user)await navigate('lobby');else{state.signup=(await api('/api/signup-status')).request;render();}
 }catch(err){$('#app').innerHTML='<main class="app-main"><h1>Unable to load</h1><p>'+E(err.message)+'</p></main>';}}
 init();
+```
+
+ఇది మొత్తం app.js ఫైల్ కంటెంట్. దీన్ని app.js ఫైల్‌లో పేస్ట్ చేసి ఉపయోగించుకోవచ్చు.
