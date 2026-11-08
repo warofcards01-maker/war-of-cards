@@ -136,4 +136,3 @@ if(state.user?.mustChange){render();showModal('Change Temporary Password',passwo
 else if(state.user&&adminRoute){await loadAdmin();render();}else if(state.user)await navigate('lobby');else{state.signup=(await api('/api/signup-status')).request;render();}
 }catch(err){$('#app').innerHTML='<main class="app-main"><h1>Unable to load</h1><p>'+E(err.message)+'</p></main>';}}
 init();
-```
