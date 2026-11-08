@@ -4,7 +4,7 @@ export const STAKES = [10, 20, 50, 100, 250, 500, 1000, 2000];
 export const MODES = [
   { id: 'point101', name: 'Point Rummy', sub: '101', limit: 101 },
   { id: 'point201', name: 'Point Rummy', sub: '201', limit: 201 },
-  { id: 'pool', name: 'Pool Rummy', sub: '101 Pool', limit: 101 },
+  { id: 'pool', name: 'Pool Rummy', sub: '', limit: 101 },
   { id: 'deals', name: 'Deal Rummy', sub: '2 Deals', deals: 2 },
 ];
 export const BOT_NAMES = (() => {
