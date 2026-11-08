@@ -1,3 +1,4 @@
+
 {
   "name": "war-of-cards",
   "version": "1.2.0",
@@ -10,7 +11,11 @@
     "setup": "node setup.js",
     "start": "node server.js",
     "dev": "node server.js",
+    "db:check": "node check-postgres.js",
     "test": "node --test test/*.test.js",
-    "check": "node --check server.js && node --check game.js && node --check tournaments.js && node --check public/app.js"
+    "check": "node --check server.js && node --check game.js && node --check tournaments.js && node --check database.js && node --check check-postgres.js && node --check public/app.js"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
   }
 }
