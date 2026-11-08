@@ -137,5 +137,3 @@ else if(state.user&&adminRoute){await loadAdmin();render();}else if(state.user)a
 }catch(err){$('#app').innerHTML='<main class="app-main"><h1>Unable to load</h1><p>'+E(err.message)+'</p></main>';}}
 init();
 ```
-
-ఇది మొత్తం app.js ఫైల్ కంటెంట్. దీన్ని app.js ఫైల్‌లో పేస్ట్ చేసి ఉపయోగించుకోవచ్చు.
