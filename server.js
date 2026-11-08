@@ -344,5 +344,3 @@ const server=http.createServer(async(req,res)=>{
 const portArg=process.argv.indexOf('--port');
 server.listen(Number(portArg>=0?process.argv[portArg+1]:process.env.PORT)||3000,'0.0.0.0',()=>console.log(`WAR OF CARDS ready on port ${server.address().port}. Admin route: /admin`));
 function shutdown(){clearInterval(ticker);server.close(()=>{db.close();process.exit(0);});setTimeout(()=>process.exit(1),5000).unref();}
-process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
-```
