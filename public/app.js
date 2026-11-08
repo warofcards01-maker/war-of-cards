@@ -1,6 +1,3 @@
-ఇదిగో మొత్తం app.js కోడ్ కాపీ చేసి పేస్ట్ చేసుకోవడానికి:
-
-```javascript
 const $=s=>document.querySelector(s);
 const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'₹'+(Number(n||0)/100).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
