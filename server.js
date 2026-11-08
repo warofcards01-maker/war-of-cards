@@ -1,6 +1,3 @@
-ఇదిగో మొత్తం server.js కోడ్ కాపీ చేసి పేస్ట్ చేసుకోవడానికి:
-
-```javascript
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
