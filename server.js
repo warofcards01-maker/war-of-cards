@@ -1,3 +1,6 @@
+ఇదిగో మొత్తం server.js కోడ్ కాపీ చేసి పేస్ట్ చేసుకోవడానికి:
+
+```javascript
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -126,13 +129,20 @@ const ticker=setInterval(gameTick,500);
 
 const rate=new Map();
 function limit(key,max=12){const t=now(),old=rate.get(key);const r=old&&old.until>t?old:{count:0,until:t+60000};r.count++;rate.set(key,r);if(r.count>max)fail('Too many attempts. Try again in one minute.',429);}
+// Real visitor address. Behind Render's proxy every request shares the proxy address, so use X-Forwarded-For when TRUST_PROXY=true.
+function clientIp(req){if(process.env.TRUST_PROXY==='true'){const f=req.headers['x-forwarded-for'];if(f)return String(f).split(',')[0].trim();}return req.socket.remoteAddress;}
 setInterval(()=>{for(const[k,v]of rate)if(v.until<now())rate.delete(k);run('DELETE FROM sessions WHERE expires<?',now());},60000).unref();
 function cookie(req,name){return (req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(`${name}=`))?.slice(name.length+1);}
 function secure(req){return !!req.socket.encrypted||(process.env.TRUST_PROXY==='true'&&req.headers['x-forwarded-proto']==='https');}
 function setCookie(req,res,name,value,age=86400){res.setHeader('Set-Cookie',`${name}=${value}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${secure(req)?'; Secure':''}`);}
-function session(req){const token=cookie(req,'pr_session');if(!token)return null;return q('SELECT u.* FROM users u JOIN sessions s ON s.user_id=u.id WHERE s.token=? AND s.expires>? AND u.blocked=0',hash(token),now());}
+// Admin and customer logins use separate cookies, so they never mix in one browser.
+// The page tells the server which area it belongs to with the X-Area header.
+const areaOf=req=>req.headers['x-area']==='admin'?'admin':'customer';
+const cookieFor=area=>area==='admin'?'pr_admin':'pr_session';
+function sessionFor(token,area){if(!token)return null;const u=q('SELECT u.* FROM users u JOIN sessions s ON s.user_id=u.id WHERE s.token=? AND s.expires>? AND u.blocked=0',hash(token),now());if(!u)return null;if((area==='admin')!==(u.role==='admin'))return null;return u;}
+function session(req){const area=areaOf(req);return sessionFor(cookie(req,cookieFor(area)),area);}
 function requireUser(req,admin=false,allowChange=false){const u=session(req);if(!u)fail('Please log in.',401);if(admin&&u.role!=='admin')fail('Admin access required.',403);if(u.must_change&&!allowChange)fail('Change your temporary password first.',403);return u;}
-function loginSession(req,res,u){const token=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',hash(token),u.id,now()+86400000);setCookie(req,res,'pr_session',token);}
+function loginSession(req,res,u){const token=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',hash(token),u.id,now()+86400000);setCookie(req,res,cookieFor(u.role==='admin'?'admin':'customer'),token);}
 async function body(req){let size=0,data=[];for await(const chunk of req){size+=chunk.length;if(size>4*1024*1024)fail('Upload is too large.',413);data.push(chunk);}try{const value=JSON.parse(Buffer.concat(data).toString()||'{}');if(!value||typeof value!=='object'||Array.isArray(value))fail('JSON object required.');return value;}catch{fail('Invalid JSON object.');}}
 function amount(v,min=1,max=1000000){if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max||Math.abs(v*100-Math.round(v*100))>0.00001)fail(`Amount must be ₹${min}–₹${max}, with at most two decimals.`);return Math.round(v*100);}
 function text(v,max=200){return typeof v==='string'?v.trim().slice(0,max):'';}
@@ -159,11 +169,11 @@ async function api(req,res,url) {
   if(route==='/api/config'&&method==='GET'){const s=settings();return{modes:MODES,stakes:STAKES,settings:{welcome:s.welcome,promo:s.promo,losing:s.losing,lossThreshold:s.lossThreshold,support:s.support,minDeposit:s.minDeposit,minWithdrawal:s.minWithdrawal},bank:{bankName:s.bankName,holderName:s.holderName,accountNumber:s.accountNumber,ifsc:s.ifsc,upi:s.upi,qr:s.qr}};}
   if(route==='/api/me'&&method==='GET'){const u=session(req);return{user:u?publicUser(u):null};}
   if(route==='/api/login'&&method==='POST') {
-    limit(`login:${req.socket.remoteAddress}`);const u=q('SELECT * FROM users WHERE username=?',text(b.username).toLowerCase());
+    limit(`login:${clientIp(req)}`);const u=q('SELECT * FROM users WHERE username=?',text(b.username).toLowerCase());
     if(!u||u.blocked||!passwordOK(text(b.password,128),u.password)||(b.admin&&u.role!=='admin')||(!b.admin&&u.role==='admin'))fail('Invalid ID/password or blocked account.',401);
     loginSession(req,res,u);return{user:publicUser(u)};
   }
-  if(route==='/api/logout'&&method==='POST'){run('DELETE FROM sessions WHERE token=?',hash(cookie(req,'pr_session')||''));setCookie(req,res,'pr_session','',0);return{ok:true};}
+  if(route==='/api/logout'&&method==='POST'){const name=cookieFor(areaOf(req));run('DELETE FROM sessions WHERE token=?',hash(cookie(req,name)||''));setCookie(req,res,name,'',0);return{ok:true};}
   if(route==='/api/password'&&method==='POST') {
     const u=requireUser(req,false,true);limit(`password:${u.id}`,8);if(!passwordOK(b.current||'',u.password))fail('Current password is incorrect.');validPassword(b.password);
     if(b.password===b.current)fail('Choose a different password.');
@@ -171,7 +181,7 @@ async function api(req,res,url) {
     const updated=q('SELECT * FROM users WHERE id=?',u.id);loginSession(req,res,updated);return{user:publicUser(updated)};
   }
   if(route==='/api/signup'&&method==='POST') {
-    limit(`signup:${req.socket.remoteAddress}`,4);const name=text(b.name,80),mobile=text(b.mobile),username=text(b.username).toLowerCase();
+    limit(`signup:${clientIp(req)}`,4);const name=text(b.name,80),mobile=text(b.mobile),username=text(b.username).toLowerCase();
     if(name.length<2||!/^\d{10}$/.test(mobile)||!/^[a-z0-9_]{4,24}$/.test(username))fail('Enter name, a 10-digit mobile and a 4–24 character User ID.');
     if(q('SELECT 1 FROM users WHERE username=?',username)||q("SELECT 1 FROM signups WHERE (username=? OR mobile=?) AND status='pending'",username,mobile))fail('An account or pending request already exists.');
     const id=randomUUID(),token=randomBytes(32).toString('hex');run('INSERT INTO signups(id,token,name,mobile,username,created) VALUES(?,?,?,?,?,?)',id,hash(token),name,mobile,username,now());setCookie(req,res,'pr_signup',token,7*86400);return{id,status:'pending'};
@@ -254,7 +264,9 @@ async function api(req,res,url) {
     tx(()=>{const fresh=q('SELECT * FROM users WHERE id=?',u.id);if(fresh.loss_progress<threshold)fail('Loss threshold has not been reached.');run('UPDATE users SET loss_progress=loss_progress-? WHERE id=?',threshold,u.id);credit(u.id,Math.round(threshold*s.losing/100),'losing_bonus','Losing bonus claimed');});return{ok:true};
   }
   if(route.startsWith('/api/proof/')&&method==='GET') {
-    const u=requireUser(req),id=route.split('/').at(-1),r=q('SELECT * FROM requests WHERE id=?',id);
+    // Proof links open in a new tab without the area header, so accept either login here.
+    const u=sessionFor(cookie(req,'pr_admin'),'admin')||sessionFor(cookie(req,'pr_session'),'customer');if(!u)fail('Please log in.',401);
+    const id=route.split('/').at(-1),r=q('SELECT * FROM requests WHERE id=?',id);
     if(!r||!r.proof||(u.role!=='admin'&&u.id!==r.user_id))fail('Not found.',404);
     res.writeHead(200,{'Content-Type':r.mime,'Content-Disposition':'inline','Cache-Control':'no-store'});res.end(Buffer.from(r.proof));return null;
   }
@@ -336,3 +348,6 @@ const portArg=process.argv.indexOf('--port');
 server.listen(Number(portArg>=0?process.argv[portArg+1]:process.env.PORT)||3000,'0.0.0.0',()=>console.log(`WAR OF CARDS ready on port ${server.address().port}. Admin route: /admin`));
 function shutdown(){clearInterval(ticker);server.close(()=>{db.close();process.exit(0);});setTimeout(()=>process.exit(1),5000).unref();}
 process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
+```
+
+ఇది మొత్తం server.js ఫైల్ కంటెంట్. మీరు దీన్ని server.js ఫైల్‌లో పేస్ట్ చేసి ఉపయోగించుకోవచ్చు.
