@@ -4,20 +4,26 @@
 
 /* 1. Oval Red Table with Silver Rim */
 .game-viewport .rummy-felt {
-  background: url('https://raw.githubusercontent.com/warofcards01-maker/war-of-cards/main/public/assets/rummy-table-bg.jpg') no-repeat center center !important;
+  /* GitHub లింక్ బదులు లోకల్ ఫైల్ పాత్ వాడుతున్నాం */
+  background: url('/assets/rummy-table-bg.jpg') no-repeat center center !important;
   background-size: 100% 100% !important;
   border-radius: 50% / 40% !important;
   border: 6px solid #b0b5bd !important;
   box-shadow: 0 0 0 3px #222, 0 0 0 5px #444, inset 0 0 40px #000 !important;
-  width: 85%;
-  height: 75%;
-  margin: 0 auto;
-  position: relative;
+  width: 90% !important; /* కొంచెం పెద్దగా చేశాను */
+  height: 80% !important;
+  margin: 0 auto !important;
+  position: relative !important;
 }
 
 /* బ్రాండ్ పేరు దాచడానికి */
 .game-viewport .felt-brand {
   display: none !important; 
+}
+
+/* పాత ఎరుపు రంగు బ్యాక్‌గ్రౌండ్ తీసేయడానికి */
+.game-viewport {
+  background-color: #000 !important;
 }
 
 /* 2. Player Seats Positions */
@@ -36,11 +42,11 @@
 }
 
 /* Seats matching the oval layout */
-.player-seat.seat-top { top: 5px; left: 50%; transform: translateX(-50%); }
-.player-seat.seat-top-left { top: 25px; left: 20%; }
-.player-seat.seat-top-right { top: 25px; right: 20%; }
-.player-seat.seat-left { left: 2%; top: 50%; transform: translateY(-50%); }
-.player-seat.seat-right { right: 2%; top: 50%; transform: translateY(-50%); }
+.player-seat.seat-top { top: -10px; left: 50%; transform: translateX(-50%); }
+.player-seat.seat-top-left { top: 20px; left: 20%; }
+.player-seat.seat-top-right { top: 20px; right: 20%; }
+.player-seat.seat-left { left: -10px; top: 50%; transform: translateY(-50%); }
+.player-seat.seat-right { right: -10px; top: 50%; transform: translateY(-50%); }
 
 /* Avatar & Info Boxes */
 .player-seat .avatar {
