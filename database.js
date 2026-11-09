@@ -1,7 +1,9 @@
-
 import pg from 'pg';
 
 const { Pool } = pg;
+
+// BIGINT columns (money in paise, millisecond timestamps) must come back as JavaScript numbers, not strings.
+pg.types.setTypeParser(20, (value) => Number(value));
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is missing. Configure it in Render.');
