@@ -30,7 +30,8 @@
 .deck-area{display:flex;align-items:center;gap:24px;padding:10px}
 .deck-area>div{display:flex;flex-direction:column;align-items:center;gap:7px}
 .pile-label{font-size:9px;color:#c7d7cc}
-.deck-back{width:50px;height:70px;border-radius:6px;border:3px solid #ecefe7;background:repeating-linear-gradient(45deg,#68162e,#68162e 4px,#862443 4px,#862443 6px);padding:0;font-size:30px;display:flex;align-items:center;justify-content:center}
+.deck-back{width:50px;height:70px;border-radius:6px;border:3px solid #ecefe7;background:repeating-linear-gradient(45deg,#68162e,#68162e 4px,#862443 4px,#862443 6px);padding:0;font-size:30px;display:flex;align-items:center;justify-content:center;position:relative}
+.deck-back::before{content:'';position:absolute;top:-4px;left:-4px;right:-4px;bottom:-4px;border:1px solid #000;border-radius:8px;z-index:-1}
 .deck-back span{background:#591528;border:1px solid #d8a9b5;border-radius:50%;padding:3px}
 .discard-pile{padding:0;background:none;border:none;min-height:0}
 .playing-card{position:relative;width:50px;height:70px;flex:0 0 50px;background:linear-gradient(130deg,#fff,#dce4dc);border-radius:5px;color:#211327;border:1px solid #bdc9be;padding:5px;box-shadow:0 2px 4px #0005;display:block;min-height:0;transition:transform 0.2s, margin-left 0.2s}
@@ -46,27 +47,58 @@
 .hand-heading{display:flex;justify-content:space-between;font-size:11px;padding:0 8px 4px;gap:10px}
 .hand-heading small{color:var(--muted);font-size:10px;font-weight:400}
 .hand-heading>span{color:#c1d5c7;font-size:10px}
-.hand-cards{display:flex;justify-content:flex-start;padding:12px 12px 20px;min-height:85px}
 
-/* The Overlap Magic happens here */
-.hand-cards .playing-card { margin-left: -35px; }
-.hand-cards .playing-card:first-child { margin-left: 0; }
+/* కార్డ్స్ అన్నీ ఒకే లైన్ లో ఉండటానికి */
+.hand-cards{
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; 
+  padding: 20px 20px 10px;
+  min-height: 95px;
+  position: relative;
+}
 
-/* When a card is grouped, it separates from the overlapping stack */
-.hand-cards .playing-card.grouped { margin-left: 8px; border: 2px solid #00ff88; }
-.hand-cards .playing-card.grouped:first-child { margin-left: 0; }
+/* Overlapping Magic: కార్డ్ మీద కార్డ్ అడ్డంగా ఎక్కడానికి */
+.hand-cards .playing-card { 
+  margin-left: -35px; 
+  flex-shrink: 0;
+  z-index: 1;
+}
+.hand-cards .playing-card:first-child { 
+  margin-left: 0; 
+}
 
-/* The Closed Card (Last card) */
+/* హోవర్ చేసినప్పుడు కార్డ్ పైకి లేవడానికి (Optional) */
+.hand-cards .playing-card:hover {
+  transform: translateY(-10px);
+  z-index: 10;
+}
+
+/* గ్రూప్ చేసినప్పుడు కొంచెం గ్యాప్ ఇవ్వడానికి */
+.hand-cards .playing-card.grouped { 
+  margin-left: 5px; 
+  border: 2px solid #00ff88; 
+  z-index: 2;
+}
+.hand-cards .playing-card.grouped:first-child { 
+  margin-left: 0; 
+}
+
+/* చివరి కార్డ్ (Closed Card) డిజైన్ */
 .hand-cards .playing-card.closed-card {
   background: repeating-linear-gradient(45deg, #5e102c, #5e102c 5px, #7e1c3d 5px, #7e1c3d 10px);
-  border: 2px solid #bdc9be;
-  box-shadow: 0 2px 4px #0005;
+  border: 1px solid #bdc9be;
   cursor: default;
+  z-index: 0;
 }
-.hand-cards .playing-card.closed-card>span, .hand-cards .playing-card.closed-card>b { display: none; }
+.hand-cards .playing-card.closed-card>span, .hand-cards .playing-card.closed-card>b { 
+  display: none; 
+}
 
-/* Ensure cards display properly in small screens */
-@media(max-width:700px){ .hand-cards .playing-card { margin-left: -38px; } }
+/* స్మాల్ స్క్రీన్స్ (మొబైల్) కి తగ్గట్టుగా ఓవర్లాప్ */
+@media(max-width:700px){ 
+  .hand-cards .playing-card { margin-left: -38px; } 
+}
 
 .game-actions{display:flex;gap:8px;align-items:center;padding-top:5px}
 .game-actions .small{font-size:11px;padding:7px 13px;min-height:32px}
