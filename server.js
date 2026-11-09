@@ -246,8 +246,8 @@ async function api(req,res,url) {
     const a=amount(b.amount,b.kind==='deposit'?s.minDeposit:s.minWithdrawal);const details={};let proof={bytes:null,mime:null};
     if(b.kind==='deposit') {
       details.utr=text(b.utr,40);details.promo=text(b.promo,30).toUpperCase();
-      if(!/^[a-zA-Z0-9-]{6,40}$/.test(details.utr))fail('Enter a valid UTR/reference.');proof=proofInfo(b.proof);if(!proof.bytes)fail('Upload payment proof.');
-      if(q("SELECT 1 FROM requests WHERE kind='deposit' AND json_extract(details,'$.utr')=?",details.utr))fail('UTR already submitted.');
+      if(!/^\d{12}$/.test(details.utr))fail('UTR must be exactly 12 digits.');proof=proofInfo(b.proof);if(!proof.bytes)fail('Payment proof image is required.');
+      if(q("SELECT 1 FROM requests WHERE kind='deposit' AND json_extract(details,'$.utr')=?",details.utr))fail('This UTR number was already submitted. Duplicate UTR is not allowed.');
     } else {
       for(const k of ['holderName','bankName','accountNumber','ifsc'])details[k]=text(b[k],80);
       if(details.holderName.length<2||details.bankName.length<2||!/^\d{9,18}$/.test(details.accountNumber)||! /^[A-Z]{4}0[A-Z0-9]{6}$/.test(details.ifsc))fail('Check your bank details.');
@@ -300,8 +300,8 @@ async function api(req,res,url) {
         if(!['approve','reject'].includes(b.decision))fail('Choose approve or reject.');
         if(b.decision==='approve'&&r.kind==='deposit') {
           credit(r.user_id,r.amount,'deposit','Deposit approved',`${r.id}:deposit`);const u=q('SELECT * FROM users WHERE id=?',r.user_id),s=settings(),d=JSON.parse(r.details);
-          if(!u.welcome_used){const bonus=Math.round(r.amount*s.welcome/100);if(bonus)credit(u.id,bonus,'welcome_bonus','Welcome bonus',`${r.id}:welcome`);run('UPDATE users SET welcome_used=1 WHERE id=?',u.id);}
-          if(!u.promo_used&&s.promoCode&&d.promo===s.promoCode.toUpperCase()){const bonus=Math.round(r.amount*s.promo/100);if(bonus)credit(u.id,bonus,'promo_bonus','Promo code bonus',`${r.id}:promo`);run('UPDATE users SET promo_used=1 WHERE id=?',u.id);}
+          
+          
         }
         if(b.decision==='reject'&&r.kind==='withdrawal')credit(r.user_id,r.amount,'withdrawal_refund','Rejected withdrawal restored',`${r.id}:restore`);
         run('UPDATE requests SET status=?,decided=? WHERE id=?',b.decision==='approve'?'approved':'rejected',now(),r.id);audit(admin.id,'decide_request',{id:r.id,decision:b.decision});
@@ -344,3 +344,4 @@ const server=http.createServer(async(req,res)=>{
 const portArg=process.argv.indexOf('--port');
 server.listen(Number(portArg>=0?process.argv[portArg+1]:process.env.PORT)||3000,'0.0.0.0',()=>console.log(`WAR OF CARDS ready on port ${server.address().port}. Admin route: /admin`));
 function shutdown(){clearInterval(ticker);server.close(()=>{db.close();process.exit(0);});setTimeout(()=>process.exit(1),5000).unref();}
+process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
