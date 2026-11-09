@@ -16,9 +16,6 @@ const keyPath = path.join(DATA, 'delivery.key');
 if (!fs.existsSync(keyPath)) fs.writeFileSync(keyPath, randomBytes(32), { mode: 0o600, flag: 'wx' });
 const secret = fs.readFileSync(keyPath);
 
-// Initialize Database on Startup
-await initializeDatabase();
-
 const q = (sql, ...args) => one(sql, args);
 const all = (sql, ...args) => many(sql, args);
 const run = async (sql, ...args) => { return await query(sql, args); };
@@ -49,9 +46,6 @@ async function audit(actor, action, details) {
 }
 
 const DEFAULTS = { welcome: 10, promo: 10, losing: 10, lossThreshold: 10000, promoCode: 'PLAY10', bankName: '', holderName: '', accountNumber: '', ifsc: '', upi: '', qr: '', support: process.env.SUPPORT_NUMBER || '', minDeposit: 100, minWithdrawal: 300 };
-for (const [k, v] of Object.entries(DEFAULTS)) {
-  await run('INSERT INTO settings(key, value) VALUES($1, $2) ON CONFLICT (key) DO NOTHING', k, JSON.stringify(v));
-}
 
 async function settings() {
   return Object.fromEntries((await all('SELECT * FROM settings')).map(r => [r.key, JSON.parse(r.value)]));
@@ -79,17 +73,51 @@ async function createUser({ name, mobile = '', username, password, role = 'custo
   return await q('SELECT * FROM users WHERE id=$1', id);
 }
 
-if (!(await q("SELECT 1 FROM users WHERE role='admin'"))) {
-  if (!process.env.ADMIN_ID || !process.env.ADMIN_PASSWORD) throw Error('First launch: set ADMIN_ID and ADMIN_PASSWORD in .env. See README.');
-  await createUser({ name: 'Administrator', username: process.env.ADMIN_ID, password: process.env.ADMIN_PASSWORD, role: 'admin', mustChange: false });
+const games = new Map();
+let tournamentService;
+let ticker;
+
+async function startServer() {
+  try {
+    console.log('Connecting to database...');
+    await initializeDatabase();
+    console.log('Database initialized.');
+
+    for (const [k, v] of Object.entries(DEFAULTS)) {
+      await run('INSERT INTO settings(key, value) VALUES($1, $2) ON CONFLICT (key) DO NOTHING', k, JSON.stringify(v));
+    }
+
+    if (!(await q("SELECT 1 FROM users WHERE role='admin'"))) {
+      if (!process.env.ADMIN_ID || !process.env.ADMIN_PASSWORD) throw Error('First launch: set ADMIN_ID and ADMIN_PASSWORD in .env. See README.');
+      await createUser({ name: 'Administrator', username: process.env.ADMIN_ID, password: process.env.ADMIN_PASSWORD, role: 'admin', mustChange: false });
+      console.log('Admin user created.');
+    }
+
+    const activeGames = await all("SELECT state FROM games WHERE status!='finished'");
+    for (const r of activeGames) {
+      const g = JSON.parse(r.state);
+      games.set(g.id, g);
+    }
+
+    tournamentService = await createTournamentService({ db: { q, all, run }, credit, tx, audit, games, saveGame });
+    
+    ticker = setInterval(gameTick, 500);
+    setInterval(async () => { 
+      for (const [k, v] of rate) if (v.until < now()) rate.delete(k); 
+      await run('DELETE FROM sessions WHERE expires<$1', now()); 
+    }, 60000).unref();
+
+    console.log('Server is ready.');
+
+  } catch (err) {
+    console.error('Startup failed:', err);
+    process.exit(1);
+  }
 }
 
-const games = new Map((await all("SELECT state FROM games WHERE status!='finished'")).map(r => { const g = JSON.parse(r.state); return [g.id, g]; }));
 const saveGame = async g => await run('INSERT INTO games(id, table_id, status, state, created) VALUES($1, $2, $3, $4, $5) ON CONFLICT(id) DO UPDATE SET status=EXCLUDED.status, state=EXCLUDED.state', g.id, g.tableId, g.status, JSON.stringify(g), g.created);
 
 const findGame = async id => games.get(id) || (async () => { const row = await q('SELECT state FROM games WHERE id=$1', id); return row ? JSON.parse(row.state) : null; })();
-
-const tournamentService = await createTournamentService({ db: { q, all, run }, credit, tx, audit, games, saveGame });
 
 async function roundEnd(g, winner) { finishRound(g, winner); if (g.status === 'finished') { if (g.tournamentId) await tournamentService.recordMatch(g); else await settle(g); } await saveGame(g); }
 
@@ -112,6 +140,7 @@ async function cancel(g, reason) { if (g.tournamentId) { await tournamentService
 let gameCursor = 0;
 async function gameTick() {
   try {
+    if (!tournamentService) return;
     await tournamentService.tick();
     const work = [...games.values()], begin = now(); let botMoves = 0;
     for (let i = 0; i < work.length; i++) {
@@ -149,12 +178,9 @@ async function gameTick() {
   } catch(e) { console.error('Tick error:', e); }
 }
 
-const ticker = setInterval(gameTick, 500);
-
 const rate = new Map();
 function limit(key, max = 12) { const t = now(), old = rate.get(key); const r = old && old.until > t ? old : { count: 0, until: t + 60000 }; r.count++; rate.set(key, r); if (r.count > max) fail('Too many attempts. Try again in one minute.', 429); }
 function clientIp(req) { if (process.env.TRUST_PROXY === 'true') { const f = req.headers['x-forwarded-for']; if (f) return String(f).split(',')[0].trim(); } return req.socket.remoteAddress; }
-setInterval(async () => { for (const [k, v] of rate) if (v.until < now()) rate.delete(k); await run('DELETE FROM sessions WHERE expires<$1', now()); }, 60000).unref();
 
 function cookie(req, name) { return (req.headers.cookie || '').split(';').map(x => x.trim()).find(x => x.startsWith(`${name}=`))?.slice(name.length + 1); }
 function secure(req) { return !!req.socket.encrypted || (process.env.TRUST_PROXY === 'true' && req.headers['x-forwarded-proto'] === 'https'); }
@@ -372,7 +398,17 @@ const server = http.createServer(async (req, res) => {
 });
 
 const portArg = process.argv.indexOf('--port');
-server.listen(Number(portArg >= 0 ? process.argv[portArg + 1] : process.env.PORT) || 3000, '0.0.0.0', () => console.log(`WAR OF CARDS ready on port ${server.address().port}. Admin route: /admin`));
+const PORT = Number(portArg >= 0 ? process.argv[portArg + 1] : process.env.PORT) || 3000;
 
-function shutdown() { clearInterval(ticker); server.close(() => { pool.end().then(() => process.exit(0)); }); setTimeout(() => process.exit(1), 5000).unref(); }
-process.on('SIGTERM', shutdown); process.on('SIGINT', shutdown);
+server.listen(PORT, '0.0.0.0', async () => {
+  console.log(`WAR OF CARDS ready on port ${server.address().port}. Admin route: /admin`);
+  await startServer();
+});
+
+function shutdown() { 
+  if (ticker) clearInterval(ticker); 
+  server.close(() => { pool.end().then(() => process.exit(0)); }); 
+  setTimeout(() => process.exit(1), 5000).unref(); 
+}
+process.on('SIGTERM', shutdown); 
+process.on('SIGINT', shutdown);
