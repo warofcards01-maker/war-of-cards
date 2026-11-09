@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim
+FROM node:22-bookworm-slim
 WORKDIR /app
 COPY package.json server.js game.js tournaments.js database.js setup.js ./
 COPY public ./public
