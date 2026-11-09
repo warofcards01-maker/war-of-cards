@@ -42,65 +42,19 @@
 .playing-card i{position:absolute;right:3px;top:2px;font-size:8px;background:#550c78;color:white;padding:1px 2px;border-radius:3px;font-style:normal}
 .playing-card.chosen{transform:translateY(-11px);outline:3px solid #a839dc;z-index:2}
 
-/* Hand Area & Overlapping Logic (ఇది మార్చబడింది) */
-.hand-area{flex:0 0 auto;max-width:1080px;width:100%;margin:auto;overflow-x:auto;padding-bottom:10px}
-.hand-heading{display:flex;justify-content:space-between;font-size:11px;padding:0 8px 4px;gap:10px}
-.hand-heading small{color:var(--muted);font-size:10px;font-weight:400}
-.hand-heading>span{color:#c1d5c7;font-size:10px}
-
-/* కార్డ్స్ ఒకే లైన్ లో */
-.hand-cards{
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-end; 
-  padding: 20px 20px 10px;
-  min-height: 95px;
-  position: relative;
-}
-
-/* Overlapping: కార్డ్ మీద కార్డ్ కుడి నుంచి ఎడమకి ఎక్కడానికి */
-.hand-cards .playing-card { 
-  margin-left: -35px; 
-  flex-shrink: 0;
-  z-index: 1;
-}
-.hand-cards .playing-card:first-child { 
-  margin-left: 0; 
-}
-
-/* హోవర్ చేసినప్పుడు కార్డ్ పైకి లేవడానికి */
-.hand-cards .playing-card:hover {
-  transform: translateY(-10px);
-  z-index: 10;
-}
-
-/* గ్రూప్ చేసినప్పుడు కొంచెం గ్యాప్ ఇవ్వడానికి */
-.hand-cards .playing-card.grouped { 
-  margin-left: 5px; 
-  border: 2px solid #00ff88; 
-  z-index: 2;
-}
-.hand-cards .playing-card.grouped:first-child { 
-  margin-left: 0; 
-}
-
-/* చివరి కార్డ్ (Closed Card) - ఇది పూర్తిగా కనిపిస్తుంది */
-.hand-cards .playing-card.closed-card {
-  background: repeating-linear-gradient(45deg, #5e102c, #5e102c 5px, #7e1c3d 5px, #7e1c3d 10px);
-  border: 1px solid #bdc9be;
-  cursor: default;
-  z-index: 0;
-  margin-left: -35px; 
-}
-.hand-cards .playing-card.closed-card>span, .hand-cards .playing-card.closed-card>b { 
-  display: none; 
-}
-
-/* స్మాల్ స్క్రీన్స్ కి తగ్గట్టుగా */
-@media(max-width:700px){ 
-  .hand-cards .playing-card { margin-left: -38px; } 
-  .hand-cards .playing-card.closed-card { margin-left: -38px; }
-}
+/* --- HAND AREA OVERLAPPING LOGIC (Rummy Style) --- */
+.game-viewport .hand-area .hand-cards{--cw:58px;--ch:82px;--ov:-33px;--gap:16px;--fs:18px;--fs2:15px;display:flex;flex-wrap:nowrap;align-items:flex-end;justify-content:flex-start;gap:0;padding:18px 10px 6px;min-height:calc(var(--ch) + 22px); overflow-x: auto;}
+@media(max-width:700px){.game-viewport .hand-area .hand-cards{--cw:46px;--ch:64px;--ov:-24px;--gap:10px;--fs:15px;--fs2:13px}}
+@media(max-height:500px) and (orientation:landscape){.game-viewport .hand-area .hand-cards{--cw:46px;--ch:64px;--ov:-24px;--gap:12px;--fs:15px;--fs2:13px}}
+.game-viewport.manual .hand-area .hand-cards{--cw:46px;--ch:64px;--ov:-24px;--gap:12px;--fs:15px;--fs2:13px;gap:0;padding-top:16px;min-height:calc(var(--ch) + 20px)}
+.game-viewport .hand-area .hand-cards .playing-card{position:relative;display:block;flex:0 0 var(--cw);width:var(--cw);height:var(--ch);min-height:0;margin:0 0 0 var(--ov);padding:0;overflow:hidden;border-radius:7px;box-shadow:-2px 0 4px #0007,0 1px 3px #0005;transition:transform .12s ease}
+.game-viewport .hand-area .hand-cards .playing-card:first-child{margin-left:0}
+.game-viewport .hand-area .hand-cards .playing-card.group-start{margin-left:var(--gap)}
+.game-viewport .hand-area .hand-cards .playing-card>span{position:absolute;left:0;top:3px;width:calc(var(--cw) + var(--ov));display:flex;flex-direction:column;align-items:center;font-size:var(--fs);line-height:1}
+.game-viewport .hand-area .hand-cards .playing-card>span small{display:block;margin-top:1px;font-size:var(--fs2)}
+.game-viewport .hand-area .hand-cards .playing-card>b{position:absolute;right:4px;bottom:5px;font-size:calc(var(--cw) * .42);line-height:1}
+.game-viewport .hand-area .hand-cards .playing-card>i{position:absolute;top:auto;right:auto;left:2px;bottom:3px;font-size:9px;padding:1px 3px}
+.game-viewport .hand-area .hand-cards .playing-card.chosen{transform:translateY(-14px);outline:3px solid #a839dc;z-index:5}
 
 .game-actions{display:flex;gap:8px;align-items:center;padding-top:5px}
 .game-actions .small{font-size:11px;padding:7px 13px;min-height:32px}
@@ -124,4 +78,4 @@
 .game-viewport.manual .waiting h2{font-size:18px}
 .game-viewport.manual .waiting .eyebrow{display:none}
 .game-viewport.manual .waiting small{font-size:9px}
-@media(orientation:portrait){.game-viewport:not(.manual) .hand-cards{flex-wrap:wrap}.game-viewport:not(.manual) .game-top>span{display:none}.game-viewport:not(.manual) .action-help{display:none}.game-viewport:not(.manual) .opponents{flex-wrap:wrap}.game-viewport:not(.manual) .player-seat{width:27%}.game-viewport:not(.manual) .game-actions{justify-content:center}}
+@media(orientation:portrait){.game-viewport:not(.manual) .hand-cards{flex-wrap:nowrap}.game-viewport:not(.manual) .game-top>span{display:none}.game-viewport:not(.manual) .action-help{display:none}.game-viewport:not(.manual) .opponents{flex-wrap:wrap}.game-viewport:not(.manual) .player-seat{width:27%}.game-viewport:not(.manual) .game-actions{justify-content:center}}
