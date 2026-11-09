@@ -42,23 +42,23 @@
 .playing-card i{position:absolute;right:3px;top:2px;font-size:8px;background:#550c78;color:white;padding:1px 2px;border-radius:3px;font-style:normal}
 .playing-card.chosen{transform:translateY(-11px);outline:3px solid #a839dc;z-index:2}
 
-/* Hand Area & Overlapping Logic */
+/* Hand Area & Overlapping Logic (ఇది మార్చబడింది) */
 .hand-area{flex:0 0 auto;max-width:1080px;width:100%;margin:auto;overflow-x:auto;padding-bottom:10px}
 .hand-heading{display:flex;justify-content:space-between;font-size:11px;padding:0 8px 4px;gap:10px}
 .hand-heading small{color:var(--muted);font-size:10px;font-weight:400}
 .hand-heading>span{color:#c1d5c7;font-size:10px}
 
-/* కార్డ్స్ అన్నీ ఒకే లైన్ లో ఉండటానికి */
+/* కార్డ్స్ ఒకే లైన్ లో */
 .hand-cards{
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-end; 
   padding: 20px 20px 10px;
   min-height: 95px;
   position: relative;
 }
 
-/* Overlapping Magic: కార్డ్ మీద కార్డ్ అడ్డంగా ఎక్కడానికి */
+/* Overlapping: కార్డ్ మీద కార్డ్ కుడి నుంచి ఎడమకి ఎక్కడానికి */
 .hand-cards .playing-card { 
   margin-left: -35px; 
   flex-shrink: 0;
@@ -68,7 +68,7 @@
   margin-left: 0; 
 }
 
-/* హోవర్ చేసినప్పుడు కార్డ్ పైకి లేవడానికి (Optional) */
+/* హోవర్ చేసినప్పుడు కార్డ్ పైకి లేవడానికి */
 .hand-cards .playing-card:hover {
   transform: translateY(-10px);
   z-index: 10;
@@ -84,20 +84,22 @@
   margin-left: 0; 
 }
 
-/* చివరి కార్డ్ (Closed Card) డిజైన్ */
+/* చివరి కార్డ్ (Closed Card) - ఇది పూర్తిగా కనిపిస్తుంది */
 .hand-cards .playing-card.closed-card {
   background: repeating-linear-gradient(45deg, #5e102c, #5e102c 5px, #7e1c3d 5px, #7e1c3d 10px);
   border: 1px solid #bdc9be;
   cursor: default;
   z-index: 0;
+  margin-left: -35px; 
 }
 .hand-cards .playing-card.closed-card>span, .hand-cards .playing-card.closed-card>b { 
   display: none; 
 }
 
-/* స్మాల్ స్క్రీన్స్ (మొబైల్) కి తగ్గట్టుగా ఓవర్లాప్ */
+/* స్మాల్ స్క్రీన్స్ కి తగ్గట్టుగా */
 @media(max-width:700px){ 
   .hand-cards .playing-card { margin-left: -38px; } 
+  .hand-cards .playing-card.closed-card { margin-left: -38px; }
 }
 
 .game-actions{display:flex;gap:8px;align-items:center;padding-top:5px}
