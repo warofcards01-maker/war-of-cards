@@ -1,7 +1,13 @@
 /* Table like the reference photo: red felt with a silver rim, players seated around it.
    2-player table: one opponent opposite you. 6-player table: five opponents around the table. */
-.game-viewport .rummy-felt{background:radial-gradient(ellipse at 50% 42%,#c8181e 0%,#8c0c12 48%,#46040a 100%);border:7px solid #bfc4cc;box-shadow:0 0 0 3px #4a4e56,0 0 0 5px #15161a,inset 0 0 45px #000b}
-.game-viewport .felt-brand{color:#ffffff10}
+.game-viewport .rummy-felt {
+  background: url('https://raw.githubusercontent.com/warofcards01-maker/war-of-cards/main/public/assets/rummy-table-bg.jpg') no-repeat center center !important;
+  background-size: 100% 100% !important;
+  border-radius: 50% / 40% !important;
+  border: 5px solid #bfc4cc !important;
+  box-shadow: 0 0 0 3px #4a4e56, 0 0 0 5px #15161a, inset 0 0 45px #000b !important;
+}
+.game-viewport .felt-brand{display:none !important}
 .game-viewport .rummy-felt .opponents{position:absolute;inset:0;display:block;pointer-events:none;z-index:1}
 .game-viewport .rummy-felt .opponents>.muted{position:absolute;top:14px;left:0;right:0;text-align:center;margin:0}
 .game-viewport .player-seat{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;max-width:none;width:auto;text-align:left;pointer-events:auto}
@@ -28,12 +34,12 @@
 .game-viewport .hand-heading{color:#fff}
 .game-viewport .game-actions button{background:linear-gradient(#6a6d74,#2b2d32);border:1px solid #a7abb3;color:#fff;border-radius:7px;text-shadow:0 1px 0 #000}
 
-/* Cards in the dark, gold-framed style of the third photo */
-.playing-card{background:linear-gradient(150deg,#2a252f,#0e0c11);border:1px solid #85693a;color:#eceef3;box-shadow:0 2px 5px #000a}
-.playing-card.red{color:#ff4b5f}
-.playing-card::after{content:'';position:absolute;inset:3px;border:1px solid #9a7b4466;border-radius:4px;pointer-events:none}
-.playing-card>b{background:linear-gradient(160deg,#ffffff,#7e838d);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 1px #000)}
-.playing-card.red>b{background:linear-gradient(160deg,#ff8a97,#b3122b);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Cards matching the white style of the reference image */
+.playing-card{background:#fff !important;border:1px solid #999 !important;color:#000 !important;box-shadow:-2px 0 5px rgba(0,0,0,0.5) !important}
+.playing-card.red{color:#d32f2f !important}
+.playing-card::after{content:'';position:absolute;inset:3px;border:1px solid #ccc;border-radius:4px;pointer-events:none}
+.playing-card>b{color:inherit !important;background:none !important;-webkit-text-fill-color:initial !important;filter:none !important}
+.playing-card.red>b{color:#d32f2f !important;background:none !important;-webkit-text-fill-color:initial !important}
 
 /* Hand of cards: cards overlap like a fan, so only the rank and suit corner of each card shows
    (the last card of every group is fully visible). Cards joined with GROUP are separated by a gap. */
@@ -44,8 +50,8 @@
 .game-viewport .hand-area .hand-cards .playing-card{position:relative;display:block;flex:0 0 var(--cw);width:var(--cw);height:var(--ch);min-height:0;margin:0 0 0 var(--ov);padding:0;overflow:hidden;border-radius:7px;box-shadow:-2px 0 4px #000a,0 1px 3px #0007;transition:transform .12s ease}
 .game-viewport .hand-area .hand-cards .playing-card:first-child{margin-left:0}
 .game-viewport .hand-area .hand-cards .playing-card.group-start{margin-left:var(--gap)}
-.game-viewport .hand-area .hand-cards .playing-card>span{position:absolute;left:0;top:3px;width:calc(var(--cw) + var(--ov));display:flex;flex-direction:column;align-items:center;font-size:var(--fs);line-height:1}
-.game-viewport .hand-area .hand-cards .playing-card>span small{display:block;margin-top:1px;font-size:var(--fs2)}
+.game-viewport .hand-area .hand-cards .playing-card>span{position:absolute;left:0;top:3px;width:calc(var(--cw) + var(--ov));display:flex;flex-direction:column;align-items:center;font-size:var(--fs);line-height:1;color:inherit;background:none}
+.game-viewport .hand-area .hand-cards .playing-card>span small{display:block;margin-top:1px;font-size:var(--fs2);color:inherit}
 .game-viewport .hand-area .hand-cards .playing-card>b{position:absolute;right:4px;bottom:5px;font-size:calc(var(--cw) * .42);line-height:1}
 .game-viewport .hand-area .hand-cards .playing-card>i{position:absolute;top:auto;right:auto;left:2px;bottom:3px;font-size:9px;padding:1px 3px}
 .game-viewport .hand-area .hand-cards .playing-card.chosen{transform:translateY(-14px);outline:3px solid #e6c36a;z-index:5}
