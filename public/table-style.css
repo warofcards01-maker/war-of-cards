@@ -31,6 +31,7 @@
   align-items: center;
   gap: 2px;
   pointer-events: auto;
+  z-index: 10;
 }
 
 /* Seats matching the oval layout */
@@ -41,12 +42,12 @@
 .player-seat.seat-right { right: -10px; top: 50%; transform: translateY(-50%); }
 
 /* =========================================
-   NAME PLATES (Sit Here pakkana plate)
+   NAME PLATES FIX (పెద్ద బాక్సులను తీసేసి చిన్న ప్లేట్ లో పేర్లు చూపించడం)
    ========================================= */
-.player-seat .seat-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+/* మీ గేమ్ లో పేర్లు చూపించే పెద్ద పర్పుల్ బాక్సులను దాచడం */
+.player-seat > div:not(.seat-body):not(.avatar):not(.seat-info):not(.mini-fan) {
+  display: none !important;
 }
 
 /* అవతార్ (Avatar) డిజైన్ */
@@ -66,38 +67,39 @@
   justify-content: center;
 }
 
-/* పేరు రాసే ప్లేట్ (Name Plate) */
+/* పేరు రాసే చిన్న ప్లేట్ (Name Plate) */
 .player-seat .seat-info {
-  background: rgba(20, 20, 20, 0.85) !important; /* ప్లేట్ బ్యాక్‌గ్రౌండ్ */
-  border: 2px solid #888 !important; /* వెండి రంగు బార్డర్ */
+  background: rgba(15, 15, 15, 0.9) !important; 
+  border: 2px solid #999 !important; 
   border-radius: 4px !important;
   text-align: center !important;
   box-shadow: 0 2px 5px #000 !important;
-  margin-left: -10px !important; /* అవతార్ కి కొంచెం దగ్గరగా */
-  padding: 5px 12px !important;
+  margin-left: -10px !important; 
+  padding: 4px 10px !important;
   z-index: 1;
-  min-width: 80px;
+  min-width: 85px;
 }
 
-/* ప్లేయర్ పేరు */
-.player-seat .seat-info b {
+/* ప్లేయర్ పేరు (Satish 04, Tarun Mehta ఇక్కడ కనిపిస్తుంది) */
+.player-seat .seat-info b, .player-seat .seat-info span {
   display: block !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: #fff !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-transform: capitalize;
 }
 
-/* స్కోర్ లేదా ఇతర వివరాలు */
+/* స్కోర్ వివరాలు */
 .player-seat .seat-info small {
   display: block !important;
-  font-size: 10px !important;
-  color: #00ff00 !important; /* స్కోర్ ఆకుపచ్చ రంగులో */
+  font-size: 11px !important;
+  color: #00ff00 !important; 
   margin-top: 2px;
 }
 
-/* Turn Glow (ఆట వంతు వచ్చినప్పుడు ఆకుపచ్చ రంగు) */
+/* Turn Glow */
 .player-seat.turn .avatar {
   border-color: #00ff00;
   box-shadow: 0 0 15px #00ff00;
