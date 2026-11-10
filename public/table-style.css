@@ -2,7 +2,6 @@
    RUMMY TABLE STYLE (FINAL FIX)
    ========================================= */
 
-/* 1. Oval Red Table with Silver Rim */
 .game-viewport .rummy-felt {
   background: url('/assets/rummy-table-bg.png') no-repeat center center !important;
   background-size: 100% 100% !important;
@@ -18,7 +17,6 @@
 .game-viewport .felt-brand { display: none !important; }
 .game-viewport { background-color: #000 !important; }
 
-/* 2. Player Seats Positions */
 .game-viewport .rummy-felt .opponents { position: absolute; inset: 0; pointer-events: none; }
 .game-viewport .player-seat {
   position: absolute;
@@ -37,15 +35,16 @@
 .player-seat.seat-right { right: -10px; top: 50%; transform: translateY(-50%); }
 
 /* =========================================
-   NAME PLATES FIX (పర్పుల్ బాక్సులను దాచడం)
+   పర్పుల్ బాక్సులను దాచడం (Hide Purple Boxes)
    ========================================= */
 
-/* ఆ పర్పుల్ బాక్సులను పూర్తిగా దాచేయడం */
+/* ఇక్కడ మనం పర్పుల్ బాక్స్ లాంటి అన్ని div లను దాచేస్తున్నాం */
 .player-seat > div:not(.seat-body):not(.avatar):not(.seat-info-v2) {
   display: none !important;
 }
 
-/* అవతార్ (Avatar) డిజైన్ */
+.player-seat .seat-body { display: flex; align-items: center; justify-content: center; }
+
 .player-seat .avatar {
   width: 45px; height: 45px;
   border: 3px solid #c8ccd3;
@@ -56,9 +55,7 @@
   display: flex; align-items: center; justify-content: center;
 }
 
-.player-seat .seat-body { display: flex; align-items: center; justify-content: center; }
-
-/* కొత్త ప్లేట్ డిజైన్ (seat-info-v2) */
+/* కొత్త ప్లేట్ (Name Plate) */
 .player-seat .seat-info-v2 {
   background: rgba(15, 15, 15, 0.95) !important; 
   border: 2px solid #999 !important; 
@@ -71,17 +68,14 @@
   display: flex; flex-direction: column;
 }
 
-/* ప్లేయర్ పేరు */
-.player-seat .seat-info-v2 b {
+.player-seat .seat-info-v2 .player-name {
   display: block !important;
   font-size: 13px !important;
   color: #fff !important;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  text-transform: capitalize;
 }
 
-/* స్కోర్ వివరాలు */
-.player-seat .seat-info-v2 small {
+.player-seat .seat-info-v2 .player-score {
   display: block !important;
   font-size: 11px !important;
   color: #00ff00 !important; 
