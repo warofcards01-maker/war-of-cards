@@ -1,149 +1,124 @@
 /* =========================================
-   RUMMY TABLE STYLE (Matching Reference Image)
+   RUMMY TABLE STYLE (LAYOUT RESTORED)
    ========================================= */
 
+/* 1. Oval Red Table (Without breaking the layout) */
 .game-viewport .rummy-felt {
   background: url('/assets/rummy-table-bg.png') no-repeat center center !important;
   background-size: 100% 100% !important;
   border-radius: 50% / 40% !important;
   border: 6px solid #b0b5bd !important;
   box-shadow: 0 0 0 3px #222, 0 0 0 5px #444, inset 0 0 40px #000 !important;
-  width: 90% !important; 
-  height: 80% !important;
+  width: 95% !important; 
+  height: 85% !important;
   margin: 0 auto !important;
   position: relative !important;
+  /* కార్డ్స్ మరియు బటన్స్ సెంటర్ అవ్వడానికి Flex వాడుతున్నాం */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important; 
+  padding: 20px 0 !important;
 }
 
 .game-viewport .felt-brand { display: none !important; }
 .game-viewport { background-color: #000 !important; }
 
-/* 2. Player Seats Positions */
-.game-viewport .rummy-felt .opponents {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.game-viewport .player-seat {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  pointer-events: auto;
-  z-index: 10;
-}
+/* Player Seats (Fixed Positions) */
+.game-viewport .rummy-felt .opponents { position: absolute; inset: 0; pointer-events: none; }
+.game-viewport .player-seat { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; z-index: 10; }
 
-.player-seat.seat-top { top: -10px; left: 50%; transform: translateX(-50%); }
-.player-seat.seat-top-left { top: 20px; left: 20%; }
-.player-seat.seat-top-right { top: 20px; right: 20%; }
-.player-seat.seat-left { left: -10px; top: 50%; transform: translateY(-50%); }
-.player-seat.seat-right { right: -10px; top: 50%; transform: translateY(-50%); }
+.player-seat.seat-top { top: 10px; left: 50%; transform: translateX(-50%); }
+.player-seat.seat-top-left { top: 40px; left: 20%; }
+.player-seat.seat-top-right { top: 40px; right: 20%; }
+.player-seat.seat-left { left: 10px; top: 50%; transform: translateY(-50%); }
+.player-seat.seat-right { right: 10px; top: 50%; transform: translateY(-50%); }
 
-/* =========================================
-   NAME PLATES FIX (పెద్ద పర్పుల్ బాక్సులను దాచడం)
-   ========================================= */
-
-/* 1. ఆ పెద్ద పర్పుల్ బాక్స్ ని దాచడం */
-.player-seat > div:not(.seat-body):not(.avatar):not(.seat-info) {
+/* పర్పుల్ బాక్సులను దాచడం */
+.player-seat > div:not(.seat-body):not(.avatar):not(.seat-info-v2) {
   display: none !important;
 }
 
-/* 2. అవతార్ డిజైన్ */
+.player-seat .seat-body { display: flex !important; align-items: center; justify-content: center; }
+
 .player-seat .avatar {
-  width: 45px;
-  height: 45px;
-  border: 3px solid #c8ccd3;
+  width: 40px; height: 40px; border: 3px solid #c8ccd3;
   background: radial-gradient(circle at 35% 30%, #e0343a, #7d0a10);
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  z-index: 2;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.6);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 16px; font-weight: bold; color: white;
+  z-index: 2; box-shadow: 0 3px 6px rgba(0,0,0,0.6); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
 }
 
-/* 3. పేరు రాసే చిన్న ప్లేట్ */
-.player-seat .seat-info {
-  background: rgba(15, 15, 15, 0.9) !important; 
-  border: 2px solid #999 !important; 
-  border-radius: 4px !important;
-  text-align: center !important;
-  box-shadow: 0 2px 5px #000 !important;
-  margin-left: -10px !important; 
-  padding: 4px 10px !important;
-  z-index: 1;
-  min-width: 85px;
-  display: flex;
-  flex-direction: column;
+.player-seat .seat-info-v2 {
+  background: rgba(15, 15, 15, 0.95) !important; 
+  border: 2px solid #999 !important; border-radius: 4px !important;
+  text-align: center !important; box-shadow: 0 2px 5px #000 !important;
+  margin-left: -10px !important; padding: 4px 10px !important;
+  z-index: 1; min-width: 80px; display: flex; flex-direction: column;
+}
+.player-seat .seat-info-v2 b { display: block !important; font-size: 12px !important; color: #fff !important; white-space: nowrap; }
+.player-seat .seat-info-v2 small { display: block !important; font-size: 10px !important; color: #00ff00 !important; margin-top: 2px; }
+.player-seat.turn .avatar { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
+
+/* =========================================
+   FIXING CARDS AND BUTTONS POSITION
+   ========================================= */
+
+/* మధ్యలో ఉన్న డెక్ మరియు డిస్కార్డ్ పైల్స్ సెంటర్ చేయడం */
+.game-viewport .table-center {
+  position: absolute !important;
+  top: 45% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 20px !important;
+  z-index: 5 !important;
 }
 
-/* ప్లేయర్ పేరు */
-.player-seat .seat-info b, .player-seat .seat-info span {
-  display: block !important;
-  font-size: 13px !important;
-  color: #fff !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* కింద ఉన్న మన చేతి కార్డ్స్ (Hand area) సెంటర్ చేయడం */
+.game-viewport .hand-area {
+  position: absolute !important;
+  bottom: 60px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  z-index: 15 !important;
 }
 
-/* స్కోర్ వివరాలు */
-.player-seat .seat-info small {
-  display: block !important;
-  font-size: 11px !important;
-  color: #00ff00 !important; 
-  margin-top: 2px;
-}
-
-.player-seat.turn .avatar {
-  border-color: #00ff00;
-  box-shadow: 0 0 15px #00ff00;
+/* SORT, GROUP, DROP, DECLARE బటన్స్ సెంటర్ చేయడం */
+.game-viewport .game-actions {
+  position: absolute !important;
+  bottom: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  gap: 10px !important;
+  z-index: 50 !important;
 }
 
 /* =========================================
-   CARDS & DECK STYLING
+   CARDS STYLING
    ========================================= */
 .playing-card {
-  background: #ffffff !important;
-  border: 1px solid #999 !important;
-  color: #000000 !important; 
+  background: #ffffff !important; border: 1px solid #999 !important; color: #000000 !important; 
   box-shadow: -2px 0 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3) !important;
-  border-radius: 5px !important;
-  position: relative !important;
+  border-radius: 5px !important; position: relative !important;
 }
 .playing-card.red { color: #e53935 !important; }
 
-.game-viewport .hand-area .hand-cards {
-  --cw: 60px;
-  --ch: 85px;
-  --ov: -35px;
-  --gap: 15px;
-}
-.game-viewport .hand-area .hand-cards .playing-card>span {
-  font-size: 20px;
-  font-weight: bold;
-  color: inherit;
-  background: none !important;
-  -webkit-text-fill-color: initial !important;
-}
-.game-viewport .hand-area .hand-cards .playing-card>span small {
-  font-size: 18px;
-}
+.game-viewport .hand-area .hand-cards { --cw: 60px; --ch: 85px; --ov: -35px; --gap: 15px; }
+.game-viewport .hand-area .hand-cards .playing-card>span { font-size: 20px; font-weight: bold; color: inherit; background: none !important; -webkit-text-fill-color: initial !important; }
+.game-viewport .hand-area .hand-cards .playing-card>span small { font-size: 18px; }
 .game-viewport .hand-area .hand-cards .playing-card.chosen {
-  transform: translateY(-20px) !important;
-  outline: 3px solid #f6c453 !important;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.6) !important;
-  z-index: 20 !important;
+  transform: translateY(-20px) !important; outline: 3px solid #f6c453 !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.6) !important; z-index: 20 !important;
 }
 
 .game-viewport .deck-back {
-  width: 55px;
-  height: 80px;
-  border-radius: 5px;
-  border: 2px solid #aaa;
+  width: 55px; height: 80px; border-radius: 5px; border: 2px solid #aaa;
   background: repeating-linear-gradient(45deg, #222 0, #222 5px, #444 5px, #444 10px);
   box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
 }
