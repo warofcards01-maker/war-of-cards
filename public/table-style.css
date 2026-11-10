@@ -1,8 +1,7 @@
 /* =========================================
-   RUMMY TABLE STYLE (ONLY CARDS & LAYOUT FIX)
+   RUMMY TABLE STYLE (ONLY CARDS & LAYOUT)
    ========================================= */
 
-/* 1. Oval Red Table */
 .game-viewport .rummy-felt {
   background: url('/assets/rummy-table-bg.png') no-repeat center center !important;
   background-size: 100% 100% !important;
@@ -17,9 +16,10 @@
 
 .game-viewport { background-color: #000 !important; }
 
-/* 2. Layout Fix (కార్డ్స్ మరియు బటన్స్ సెంటర్ చేయడం) */
+/* ప్లేయర్స్ మరియు పేర్లను పూర్తిగా దాచడం */
+.game-viewport .opponents { display: none !important; }
 
-/* టేబుల్ మధ్యలో డెక్ మరియు డిస్కార్డ్ పైల్స్ */
+/* మధ్యలో ఉన్న డెక్ మరియు డిస్కార్డ్ కార్డ్స్ */
 .game-viewport .table-center {
   position: absolute !important;
   top: 45% !important;
@@ -31,10 +31,10 @@
   z-index: 5 !important;
 }
 
-/* కింద మన చేతి కార్డ్స్ */
+/* మన చేతి కార్డ్స్ (Hand Cards) */
 .game-viewport .hand-area {
   position: absolute !important;
-  bottom: 70px !important;
+  bottom: 80px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   width: 100% !important;
@@ -55,9 +55,7 @@
   z-index: 50 !important;
 }
 
-/* =========================================
-   CARDS STYLING (తెల్లని కార్డ్స్)
-   ========================================= */
+/* తెల్లని కార్డ్స్ డిజైన్ */
 .playing-card {
   background: #ffffff !important; 
   border: 1px solid #999 !important; 
@@ -68,7 +66,6 @@
 }
 .playing-card.red { color: #e53935 !important; }
 
-/* హ్యాండ్ లో కార్డ్స్ సైజు */
 .game-viewport .hand-area .hand-cards { 
   --cw: 60px; 
   --ch: 85px; 
@@ -83,7 +80,6 @@
   background: none !important; 
   -webkit-text-fill-color: initial !important; 
 }
-
 .game-viewport .hand-area .hand-cards .playing-card>span small { font-size: 18px; }
 
 .game-viewport .hand-area .hand-cards .playing-card.chosen {
@@ -93,12 +89,8 @@
   z-index: 20 !important;
 }
 
-/* డెక్ బ్యాక్ కార్డ్ */
 .game-viewport .deck-back {
-  width: 55px; 
-  height: 80px; 
-  border-radius: 5px; 
-  border: 2px solid #aaa;
+  width: 55px; height: 80px; border-radius: 5px; border: 2px solid #aaa;
   background: repeating-linear-gradient(45deg, #222 0, #222 5px, #444 5px, #444 10px);
   box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
 }
