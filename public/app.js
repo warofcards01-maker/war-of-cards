@@ -40,7 +40,20 @@ function seats(g,me,turn,playing){
   const others=g.players.filter(p=>p.id!==me?.id).slice(0,5);
   if(!others.length)return '<div class="opponents"><p class="muted">Waiting for an opponent…</p></div>';
   const layout=SEAT_LAYOUT[others.length];
-  return `<div class="opponents seats-${others.length}">${others.map((p,i)=>{const n=Math.max(0,Math.min(13,p.cardCount??(g.status==='playing'?13:0)));return `<div class="player-seat seat-${layout[i]} ${playing&&turn?.id===p.id?'turn':''} ${p.dropped||p.eliminated?'out':''}"><div class="mini-fan" aria-label="${n} hidden cards">${'<i></i>'.repeat(n)}</div><div class="seat-body"><span class="avatar">${E(p.name[0])}</span><div class="seat-info"><b>${E(p.name)}</b><small>${p.bot?'Computer · ':''}${p.score} pts${p.penaltyThisRound?' · +'+p.penaltyThisRound+' penalty':''}</small>${p.dropped||p.eliminated?'<small>'+(p.eliminated?'Eliminated':'Dropped')+'</small>':''}</div></div></div>`;}).join('')}</div>`;
+  return `<div class="opponents seats-${others.length}">${others.map((p,i)=>{
+    const n=Math.max(0,Math.min(13,p.cardCount??(g.status==='playing'?13:0)));
+    return `<div class="player-seat seat-${layout[i]} ${playing&&turn?.id===p.id?'turn':''} ${p.dropped||p.eliminated?'out':''}">
+      <div class="mini-fan" aria-label="${n} hidden cards">${'<i></i>'.repeat(n)}</div>
+      <div class="seat-body">
+        <span class="avatar">${E(p.name[0])}</span>
+        <div class="seat-info">
+          <b>${E(p.name)}</b>
+          <small>${p.bot?'Computer · ':''}${p.score} pts${p.penaltyThisRound?' · +'+p.penaltyThisRound+' penalty':''}</small>
+          ${p.dropped||p.eliminated?'<small>'+(p.eliminated?'Eliminated':'Dropped')+'</small>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 function gameScreen(){
   const g=state.game,me=g.players.find(p=>p.id===state.user.id),turn=g.players[g.turn],playing=g.status==='playing',mine=playing&&turn?.id===me?.id&&!me?.dropped&&!me?.eliminated,m=g.tournamentId?{name:g.tournamentName,sub:'Round '+g.tournamentRound+'/'+g.tournamentRounds}:state.config.modes.find(m=>m.id===g.mode);
