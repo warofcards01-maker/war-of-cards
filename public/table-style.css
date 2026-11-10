@@ -2,13 +2,10 @@
    RUMMY TABLE STYLE (Matching Reference Image)
    ========================================= */
 
-.game-viewport {
-  background-color: #000 !important;
-}
-
+/* 1. Oval Red Table with Silver Rim */
 .game-viewport .rummy-felt {
-  /* ఇక్కడ ?v=2 యాడ్ చేశాను, ఇది క్యాష్ ని క్లియర్ చేస్తుంది */
-  background: url('/assets/rummy-table-bg.jpg?v=2') no-repeat center center !important;
+  /* ఇమేజ్ పేరును .png గా మార్చాను */
+  background: url('/assets/rummy-table-bg.png') no-repeat center center !important;
   background-size: 100% 100% !important;
   border-radius: 50% / 40% !important;
   border: 6px solid #b0b5bd !important;
@@ -19,8 +16,17 @@
   position: relative !important;
 }
 
-.game-viewport .felt-brand { display: none !important; }
+/* బ్రాండ్ పేరు దాచడానికి */
+.game-viewport .felt-brand {
+  display: none !important; 
+}
 
+/* పాత ఎరుపు రంగు బ్యాక్‌గ్రౌండ్ తీసేయడానికి */
+.game-viewport {
+  background-color: #000 !important;
+}
+
+/* 2. Player Seats Positions */
 .game-viewport .rummy-felt .opponents {
   position: absolute;
   inset: 0;
@@ -35,12 +41,14 @@
   pointer-events: auto;
 }
 
+/* Seats matching the oval layout */
 .player-seat.seat-top { top: -10px; left: 50%; transform: translateX(-50%); }
 .player-seat.seat-top-left { top: 20px; left: 20%; }
 .player-seat.seat-top-right { top: 20px; right: 20%; }
 .player-seat.seat-left { left: -10px; top: 50%; transform: translateY(-50%); }
 .player-seat.seat-right { right: -10px; top: 50%; transform: translateY(-50%); }
 
+/* Avatar & Info Boxes */
 .player-seat .avatar {
   width: 40px;
   height: 40px;
@@ -65,21 +73,24 @@
 .player-seat .seat-info b { font-size: 11px; color: #fff; }
 .player-seat .seat-info small { font-size: 10px; color: #aaa; }
 
+/* Turn Glow */
 .player-seat.turn .avatar {
   border-color: #00ff00;
   box-shadow: 0 0 15px #00ff00;
 }
 
+/* 3. White Cards Styling */
 .playing-card {
   background: #ffffff !important;
   border: 1px solid #999 !important;
-  color: #000000 !important;
+  color: #000000 !important; /* Black suits */
   box-shadow: -2px 0 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3) !important;
   border-radius: 5px !important;
   position: relative !important;
 }
-.playing-card.red { color: #e53935 !important; }
+.playing-card.red { color: #e53935 !important; } /* Red suits */
 
+/* Card details layout */
 .game-viewport .hand-area .hand-cards {
   --cw: 60px;
   --ch: 85px;
@@ -103,6 +114,7 @@
   z-index: 20 !important;
 }
 
+/* Center Deck */
 .game-viewport .deck-back {
   width: 55px;
   height: 80px;
