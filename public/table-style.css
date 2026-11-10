@@ -1,8 +1,8 @@
 /* =========================================
-   RUMMY TABLE STYLE (LAYOUT RESTORED)
+   RUMMY TABLE STYLE (FINAL PERFECT FIX)
    ========================================= */
 
-/* 1. Oval Red Table (Without breaking the layout) */
+/* 1. Oval Red Table */
 .game-viewport .rummy-felt {
   background: url('/assets/rummy-table-bg.png') no-repeat center center !important;
   background-size: 100% 100% !important;
@@ -13,33 +13,37 @@
   height: 85% !important;
   margin: 0 auto !important;
   position: relative !important;
-  /* కార్డ్స్ మరియు బటన్స్ సెంటర్ అవ్వడానికి Flex వాడుతున్నాం */
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important; 
-  padding: 20px 0 !important;
 }
 
 .game-viewport .felt-brand { display: none !important; }
 .game-viewport { background-color: #000 !important; }
 
-/* Player Seats (Fixed Positions) */
+/* =========================================
+   పర్పుల్ బాక్సులను పూర్తిగా దాచేయడం
+   ========================================= */
+.player-seat > div {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.player-seat .seat-body {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+}
+
+/* Player Seats Positions */
 .game-viewport .rummy-felt .opponents { position: absolute; inset: 0; pointer-events: none; }
 .game-viewport .player-seat { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; z-index: 10; }
 
-.player-seat.seat-top { top: 10px; left: 50%; transform: translateX(-50%); }
-.player-seat.seat-top-left { top: 40px; left: 20%; }
-.player-seat.seat-top-right { top: 40px; right: 20%; }
-.player-seat.seat-left { left: 10px; top: 50%; transform: translateY(-50%); }
-.player-seat.seat-right { right: 10px; top: 50%; transform: translateY(-50%); }
+.player-seat.seat-top { top: 5px; left: 50%; transform: translateX(-50%); }
+.player-seat.seat-top-left { top: 25px; left: 18%; }
+.player-seat.seat-top-right { top: 25px; right: 18%; }
+.player-seat.seat-left { left: 5px; top: 50%; transform: translateY(-50%); }
+.player-seat.seat-right { right: 5px; top: 50%; transform: translateY(-50%); }
 
-/* పర్పుల్ బాక్సులను దాచడం */
-.player-seat > div:not(.seat-body):not(.avatar):not(.seat-info-v2) {
-  display: none !important;
-}
-
-.player-seat .seat-body { display: flex !important; align-items: center; justify-content: center; }
-
+/* అవతార్ & పేరు ప్లేట్ */
 .player-seat .avatar {
   width: 40px; height: 40px; border: 3px solid #c8ccd3;
   background: radial-gradient(circle at 35% 30%, #e0343a, #7d0a10);
@@ -47,7 +51,6 @@
   z-index: 2; box-shadow: 0 3px 6px rgba(0,0,0,0.6); border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
 }
-
 .player-seat .seat-info-v2 {
   background: rgba(15, 15, 15, 0.95) !important; 
   border: 2px solid #999 !important; border-radius: 4px !important;
@@ -57,13 +60,16 @@
 }
 .player-seat .seat-info-v2 b { display: block !important; font-size: 12px !important; color: #fff !important; white-space: nowrap; }
 .player-seat .seat-info-v2 small { display: block !important; font-size: 10px !important; color: #00ff00 !important; margin-top: 2px; }
+
+/* ఆట వంతు వచ్చినప్పుడు ఆకుపచ్చ రంగు రావడానికి */
 .player-seat.turn .avatar { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
+.player-seat.turn .seat-info-v2 { border-color: #00ff00 !important; }
 
 /* =========================================
-   FIXING CARDS AND BUTTONS POSITION
+   కార్డ్స్ మరియు బటన్స్ సెంటర్ చేయడం
    ========================================= */
 
-/* మధ్యలో ఉన్న డెక్ మరియు డిస్కార్డ్ పైల్స్ సెంటర్ చేయడం */
+/* మధ్యలో ఉన్న డెక్ మరియు డిస్కార్డ్ పైల్స్ */
 .game-viewport .table-center {
   position: absolute !important;
   top: 45% !important;
@@ -75,10 +81,10 @@
   z-index: 5 !important;
 }
 
-/* కింద ఉన్న మన చేతి కార్డ్స్ (Hand area) సెంటర్ చేయడం */
+/* మన చేతి కార్డ్స్ (Hand area) */
 .game-viewport .hand-area {
   position: absolute !important;
-  bottom: 60px !important;
+  bottom: 70px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   width: 100% !important;
@@ -88,7 +94,7 @@
   z-index: 15 !important;
 }
 
-/* SORT, GROUP, DROP, DECLARE బటన్స్ సెంటర్ చేయడం */
+/* SORT, GROUP, DROP, DECLARE బటన్స్ */
 .game-viewport .game-actions {
   position: absolute !important;
   bottom: 10px !important;
