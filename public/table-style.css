@@ -2,7 +2,6 @@
    RUMMY TABLE STYLE (Matching Reference Image)
    ========================================= */
 
-/* 1. Oval Red Table with Silver Rim */
 .game-viewport .rummy-felt {
   background: url('/assets/rummy-table-bg.png') no-repeat center center !important;
   background-size: 100% 100% !important;
@@ -34,7 +33,6 @@
   z-index: 10;
 }
 
-/* Seats matching the oval layout */
 .player-seat.seat-top { top: -10px; left: 50%; transform: translateX(-50%); }
 .player-seat.seat-top-left { top: 20px; left: 20%; }
 .player-seat.seat-top-right { top: 20px; right: 20%; }
@@ -42,15 +40,15 @@
 .player-seat.seat-right { right: -10px; top: 50%; transform: translateY(-50%); }
 
 /* =========================================
-   NAME PLATES FIX (పెద్ద బాక్సులను తీసేసి చిన్న ప్లేట్ లో పేర్లు చూపించడం)
+   NAME PLATES FIX (పెద్ద పర్పుల్ బాక్సులను దాచడం)
    ========================================= */
 
-/* మీ గేమ్ లో పేర్లు చూపించే పెద్ద పర్పుల్ బాక్సులను దాచడం */
-.player-seat > div:not(.seat-body):not(.avatar):not(.seat-info):not(.mini-fan) {
+/* 1. ఆ పెద్ద పర్పుల్ బాక్స్ ని దాచడం */
+.player-seat > div:not(.seat-body):not(.avatar):not(.seat-info) {
   display: none !important;
 }
 
-/* అవతార్ (Avatar) డిజైన్ */
+/* 2. అవతార్ డిజైన్ */
 .player-seat .avatar {
   width: 45px;
   height: 45px;
@@ -67,7 +65,7 @@
   justify-content: center;
 }
 
-/* పేరు రాసే చిన్న ప్లేట్ (Name Plate) */
+/* 3. పేరు రాసే చిన్న ప్లేట్ */
 .player-seat .seat-info {
   background: rgba(15, 15, 15, 0.9) !important; 
   border: 2px solid #999 !important; 
@@ -78,9 +76,11 @@
   padding: 4px 10px !important;
   z-index: 1;
   min-width: 85px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ప్లేయర్ పేరు (Satish 04, Tarun Mehta ఇక్కడ కనిపిస్తుంది) */
+/* ప్లేయర్ పేరు */
 .player-seat .seat-info b, .player-seat .seat-info span {
   display: block !important;
   font-size: 13px !important;
@@ -88,7 +88,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: capitalize;
 }
 
 /* స్కోర్ వివరాలు */
@@ -99,7 +98,6 @@
   margin-top: 2px;
 }
 
-/* Turn Glow */
 .player-seat.turn .avatar {
   border-color: #00ff00;
   box-shadow: 0 0 15px #00ff00;
