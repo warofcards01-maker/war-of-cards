@@ -45,9 +45,9 @@ function seats(g,me,turn,playing){
     return `<div class="player-seat seat-${layout[i]} ${playing&&turn?.id===p.id?'turn':''} ${p.dropped||p.eliminated?'out':''}">
       <div class="mini-fan" aria-label="${n} hidden cards">${'<i></i>'.repeat(n)}</div>
       <div class="seat-body">
-        <span class="avatar">${E(p.name[0])}</span>
-        <div class="seat-info">
-          <b>${E(p.name)}</b>
+        <span class="avatar">${E(p.name[0])}</spanm   
+     <div class="seat-info-v2">
+     <b>${E(p.name)}</b>
           <small>${p.bot?'Computer · ':''}${p.score} pts${p.penaltyThisRound?' · +'+p.penaltyThisRound+' penalty':''}</small>
           ${p.dropped||p.eliminated?'<small>'+(p.eliminated?'Eliminated':'Dropped')+'</small>':''}
         </div>
