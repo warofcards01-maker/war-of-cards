@@ -1,5 +1,5 @@
 /* =========================================
-   RUMMY TABLE STYLE (FINAL FIX)
+   RUMMY TABLE STYLE (FINAL LAYOUT FIX)
    ========================================= */
 
 .game-viewport .rummy-felt {
@@ -17,6 +17,7 @@
 .game-viewport .felt-brand { display: none !important; }
 .game-viewport { background-color: #000 !important; }
 
+/* Player Seats Positions */
 .game-viewport .rummy-felt .opponents { position: absolute; inset: 0; pointer-events: none; }
 .game-viewport .player-seat {
   position: absolute;
@@ -34,16 +35,16 @@
 .player-seat.seat-left { left: -10px; top: 50%; transform: translateY(-50%); }
 .player-seat.seat-right { right: -10px; top: 50%; transform: translateY(-50%); }
 
-/* =========================================
-   పర్పుల్ బాక్సులను దాచడం (Hide Purple Boxes)
-   ========================================= */
-
-/* ఇక్కడ మనం పర్పుల్ బాక్స్ లాంటి అన్ని div లను దాచేస్తున్నాం */
+/* పర్పుల్ బాక్సులను దాచడం */
 .player-seat > div:not(.seat-body):not(.avatar):not(.seat-info-v2) {
   display: none !important;
 }
 
-.player-seat .seat-body { display: flex; align-items: center; justify-content: center; }
+.player-seat .seat-body {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
 
 .player-seat .avatar {
   width: 45px; height: 45px;
@@ -68,14 +69,14 @@
   display: flex; flex-direction: column;
 }
 
-.player-seat .seat-info-v2 .player-name {
+.player-seat .seat-info-v2 b {
   display: block !important;
   font-size: 13px !important;
   color: #fff !important;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.player-seat .seat-info-v2 .player-score {
+.player-seat .seat-info-v2 small {
   display: block !important;
   font-size: 11px !important;
   color: #00ff00 !important; 
@@ -85,7 +86,44 @@
 .player-seat.turn .avatar { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
 
 /* =========================================
-   CARDS & DECK STYLING
+   కార్డ్స్ మరియు బటన్స్ సెంటర్ చేయడం (Layout Fix)
+   ========================================= */
+
+/* టేబుల్ సెంటర్ లో కార్డ్స్ కనిపించేలా చేయడం */
+.game-viewport .table-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  z-index: 5;
+}
+
+/* డిస్కార్డ్ మరియు డెక్ పైల్స్ సరిగ్గా ఉండేలా */
+.game-viewport .deck-area {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* కింద ఉన్న బటన్స్ (SORT, GROUP, DROP, DECLARE) సెంటర్ చేయడం */
+.game-viewport .game-actions {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 20;
+}
+
+/* =========================================
+   CARDS STYLING
    ========================================= */
 .playing-card {
   background: #ffffff !important;
