@@ -300,3 +300,28 @@
 .table-button.my-running-table strong {
   color: white !important;
 }
+/* Mobile card drag and reorder */
+
+.hand-cards {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hand-cards .playing-card {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  cursor: grab;
+}
+
+.hand-cards .playing-card:active {
+  cursor: grabbing;
+}
+
+.hand-cards .playing-card.dragging {
+  z-index: 100;
+  opacity: 0.75;
+  transform: translateY(-12px);
+}
