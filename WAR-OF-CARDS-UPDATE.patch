@@ -1,0 +1,145 @@
+diff --git a/server.js b/server.js
+--- a/server.js
++++ b/server.js
+@@ -296,3 +296,3 @@
+-    const previous=[...games.values()].find(g=>g.status!=='finished'&&g.players.some(p=>p.id===u.id));
+-    if(previous)return{game:viewGame(previous,u.id)};
+-    if(u.balance<t.stake*100)fail('LOW BALANCE');
++    const existingHere=[...games.values()].find(g=>g.tableId===t.id&&g.status!=='finished'&&g.players.some(p=>p.id===u.id));
++    if(existingHere)return{game:viewGame(existingHere,u.id)};
++    if(u.balance<t.stake*100)fail('LOW BALANCE');
+@@ -437,1 +437,8 @@
++    if(route==='/api/admin/notifications'&&method==='GET') {
++      const since=Number(url.searchParams.get('since')||0);
++      const safeSince=Number.isFinite(since)&&since>=0?since:0;
++      const signups=await all("SELECT id,created,name,username FROM signups WHERE status='pending' AND created>? ORDER BY created DESC LIMIT 30",safeSince);
++      const requests=await all("SELECT r.id,r.created,r.kind,u.name,u.username FROM requests r JOIN users u ON u.id=r.user_id WHERE r.status='pending' AND r.created>? ORDER BY r.created DESC LIMIT 60",safeSince);
++      return {serverTime:now(),items:[...signups.map(r=>({id:r.id,created:Number(r.created),kind:'signup',name:r.name,username:r.username})),...requests.map(r=>({id:r.id,created:Number(r.created),kind:r.kind,name:r.name,username:r.username}))].sort((x,y)=>x.created-y.created)};
++    }
+     if(route==='/api/admin/create-user'&&method==='POST') {
+diff --git a/public/app.js b/public/app.js
+--- a/public/app.js
++++ b/public/app.js
+@@ -6,1 +6,1 @@
+-const state={user:null,config:null,page:'home'
++const state={activeTableIds:new Set(),user:null,config:null,page:'home'
+@@ -30,1 +30,1 @@
+-disabled=t?.disabled||t?.status&&t.status!=='ready'&&t.status!=='waiting',status=t?.disabled?'Paused':t?.status==='playing'||t?.status==='roundOver'?'Playing':t?.occupancy?`${t.occupancy}/${cap} Joined`:'Ready';return `<button class="table-button ${cap===6?'wine':''}" data-action="join" data-id="${id}" title="${E(status)} · ${cap} Players" aria-label="T${i}, ₹${stake}, ${cap} Players, ${E(status)}" ${disabled?'disabled':''}><strong>T${i}</strong></button>`;
++mine=state.activeTableIds.has(id),disabled=t?.disabled||(!mine&&t?.status&&t.status!=='ready'&&t.status!=='waiting'),status=mine?'YOUR RUNNING GAME':t?.disabled?'Paused':t?.status==='playing'||t?.status==='roundOver'?'Playing':t?.occupancy?`${t.occupancy}/${cap} Joined`:'Ready';return `<button class="table-button ${cap===6?'wine':''} ${mine?'running-table':''}" data-action="join" data-id="${id}" title="${E(status)} · ${cap} Players" aria-label="T${i}, ₹${stake}, ${cap} Players, ${E(status)}" ${disabled?'disabled':''}><strong>T${i}</strong></button>`;
+@@ -150,1 +150,1 @@
+-if(page==='lobby')state.tables=(await api('/api/tables')).tables;if(page==='history')state.history=(await api('/api/my-games')).games;
++if(page==='lobby'){state.tables=(await api('/api/tables')).tables;const recent=(await api('/api/my-games')).games;state.activeTableIds=new Set(recent.filter(g=>g.status!=='finished').map(g=>g.tableId));}if(page==='history')state.history=(await api('/api/my-games')).games;
+@@ -180,1 +180,1 @@
+-'leave-game':async()=>{if(state.game.status==='waiting')return gameAction('leave');const tid=state.game?.tournamentId;
++'leave-game':async()=>{const tid=state.game?.tournamentId;
+@@ -300,1 +300,110 @@
+ init();
++
++// WAR OF CARDS — touch/mouse card reorder. Does not change server-side game state.
++(() => {
++  let drag = null;
++  const handCards = () => document.querySelector('.game-viewport .hand-cards');
++  document.addEventListener('pointerdown', event => {
++    const el = event.target.closest('.hand-cards .playing-card[data-id]');
++    if (!el || !state.game || event.button > 0) return;
++    drag = {id:el.dataset.id, startX:event.clientX, startY:event.clientY, x:event.clientX, moved:false, pointerId:event.pointerId};
++  }, {passive:true});
++  document.addEventListener('pointermove', event => {
++    if (!drag || event.pointerId !== drag.pointerId) return;
++    const distance = Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY);
++    if (distance < 9 && !drag.moved) return;
++    drag.moved=true;
++    drag.x=event.clientX;
++    const el = [...(handCards()?.querySelectorAll('.playing-card[data-id]')||[])].find(n=>n.dataset.id===drag.id);
++    if (el) { el.classList.add('dragging-card');el.style.setProperty('--drag-x',`${event.clientX-drag.startX}px`);el.style.setProperty('--drag-y',`${event.clientY-drag.startY}px`); }
++    event.preventDefault();
++  }, {passive:false});
++  document.addEventListener('pointerup', event => {
++    if (!drag || event.pointerId !== drag.pointerId) return;
++    const d=drag;drag=null;
++    const container=handCards();
++    const el=[...(container?.querySelectorAll('.playing-card[data-id]')||[])].find(n=>n.dataset.id===d.id);
++    if(el){el.classList.remove('dragging-card');el.style.removeProperty('--drag-x');el.style.removeProperty('--drag-y');}
++    if(!d.moved || !container) return;
++    window.__wocDragUntil=Date.now()+350;
++    const me=state.game?.players.find(p=>p.id===state.user?.id);
++    if(!me?.hand) return;
++    const original=me.hand.findIndex(c=>c.id===d.id);
++    if(original<0)return;
++    const other=[...container.querySelectorAll('.playing-card[data-id]')].filter(n=>n.dataset.id!==d.id);
++    let target=other.findIndex(n=>event.clientX < n.getBoundingClientRect().left+n.getBoundingClientRect().width/2);
++    if(target<0)target=other.length;
++    const [card]=me.hand.splice(original,1);
++    me.hand.splice(target,0,card);
++    state.selected=[];
++    render();
++  }, {passive:true});
++  document.addEventListener('pointercancel',()=>{drag=null;document.querySelectorAll('.dragging-card').forEach(el=>{el.classList.remove('dragging-card');el.style.removeProperty('--drag-x');el.style.removeProperty('--drag-y');});});
++  // Stop the delegated click handler from selecting a card after dragging it.
++  document.addEventListener('click',event=>{
++    if(event.target.closest('.hand-cards .playing-card') && Date.now() < (window.__wocDragUntil||0))event.stopImmediatePropagation();
++  },true);
++})();
++
++// Admin pending requests: browser-generated sounds (after first user gesture).
++(() => {
++  if(!adminRoute) return;
++  let last=0, initialized=false, seen=new Set(), audio=null;
++  function sound(kind){
++    try{
++      const C=window.AudioContext||window.webkitAudioContext;
++      if(!C)return;
++      audio=audio||new C();if(audio.state!=='running')return;
++      const notes=kind==='signup'?[523,659,784]:kind==='deposit'?[440,660,880]:[784,587,392];
++      notes.forEach((freq,i)=>{const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime+i*.13;
++        o.type=kind==='withdrawal'?'triangle':'sine';o.frequency.value=freq;
++        g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(.12,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.12);
++        o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.13);
++      });
++    }catch{}
++  }
++  document.addEventListener('pointerdown',()=>{try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();audio.resume();}catch{}},{passive:true});
++  async function poll(){
++    if(!state.user || state.user.role!=='admin' || document.hidden)return;
++    try{
++      const data=await api('/api/admin/notifications?since='+last);
++      if(!initialized){initialized=true;last=data.serverTime;return;}
++      for(const item of data.items){
++        if(seen.has(item.id))continue;
++        seen.add(item.id);last=Math.max(last,item.created);
++        const title=item.kind==='signup'?'New customer signup':item.kind==='deposit'?'New deposit request':'New withdrawal request';
++        toast(title+' — '+item.name);sound(item.kind);
++      }
++      if(seen.size>500)seen=new Set([...seen].slice(-250));
++    }catch(e){/* transient network failure; retry */}
++  }
++  setInterval(poll,5000);
++})();
++// Admin notification bell with pending counts, linked to existing tabs.
++(() => {
++  if (!adminRoute) return;
++  const draw = () => {
++    const heading=document.querySelector('.admin-heading');
++    if(!heading || !state.admin) return;
++    let bell=document.getElementById('woc-admin-bell');
++    if(!bell){bell=document.createElement('button');bell.id='woc-admin-bell';bell.type='button';bell.className='small ghost';heading.appendChild(bell);}
++    const a=state.admin;
++    const sign=a.signups.filter(x=>x.status==='pending').length;
++    const dep=a.requests.filter(x=>x.status==='pending'&&x.kind==='deposit').length;
++    const wd=a.requests.filter(x=>x.status==='pending'&&x.kind==='withdrawal').length;
++    bell.textContent=`🔔 ${sign+dep+wd} · ID ${sign} · D ${dep} · W ${wd}`;
++    bell.onclick=()=>{state.adminTab=sign?'signups':dep?'deposits':wd?'withdrawals':'overview';render();};
++  };
++  const observer=new MutationObserver(()=>draw());
++  observer.observe(document.getElementById('app'),{childList:true,subtree:false});
++  setInterval(async()=>{if(!state.user||state.user.role!=='admin'||document.hidden||state.busy)return;
++    try{const a=await api('/api/admin/state');state.admin=a;draw();}catch{}},10000);
++})();
++// Highlight own active table and indicate dragged card.
++(() => {
++ const style=document.createElement('style');style.textContent=`
++.table-button.running-table:not(:disabled){background:linear-gradient(160deg,#0c8f45,#07582b)!important;border:2px solid #55ff99!important;color:#fff!important;box-shadow:0 0 10px #25d366aa!important}
++.game-viewport .hand-cards .playing-card{touch-action:none;user-select:none;-webkit-user-select:none}
++.game-viewport .hand-cards .playing-card.dragging-card{transform:translate(var(--drag-x,0px),var(--drag-y,0px)) scale(1.09)!important;z-index:100!important;transition:none!important;outline:2px solid #55ff99!important;pointer-events:none}`;
++ document.head.appendChild(style);
++})();
