@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,23 +7,93 @@
   <meta name="theme-color" content="#050505">
   <meta name="description" content="WAR OF CARDS — Play Rummy, Win Money.">
   <title>WAR OF CARDS — Play Rummy, Win Money</title>
-  
+
   <link rel="icon" href="/assets/brand-logo.png" type="image/png">
-  
-  <!-- పాత స్టైల్స్ -->
+
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/theme.css">
   <link rel="stylesheet" href="/tournaments.css">
-  
-  <!-- కొత్త టేబుల్ ఇమేజ్ స్టైల్స్ (ఇది చివర్లో ఉండాలి) -->
   <link rel="stylesheet" href="/table-style.css">
+
+  <script>
+    window.wocStarted = false;
+
+    function showStartupError(message) {
+      const app = document.getElementById('app');
+      if (!app) return;
+
+      app.innerHTML = '';
+
+      const panel = document.createElement('div');
+      panel.style.cssText =
+        'padding:24px;margin:40px 15px;' +
+        'background:#250909;color:white;' +
+        'border:1px solid #b91c1c;' +
+        'border-radius:12px;' +
+        'font:15px Arial,sans-serif;' +
+        'overflow-wrap:anywhere;';
+
+      const title = document.createElement('h2');
+      title.textContent = 'WAR OF CARDS - STARTUP ERROR';
+
+      const details = document.createElement('pre');
+      details.style.cssText =
+        'white-space:pre-wrap;overflow-wrap:anywhere;';
+      details.textContent = message;
+
+      panel.append(title, details);
+      app.appendChild(panel);
+    }
+
+    window.addEventListener('error', function(event) {
+      if (!window.wocStarted) {
+        showStartupError(
+          'JavaScript Error:\n' +
+          (event.message || 'Unknown error') +
+          '\nFile: ' + (event.filename || 'Unknown') +
+          '\nLine: ' + (event.lineno || 0)
+        );
+      }
+    });
+
+    window.addEventListener(
+      'unhandledrejection',
+      function(event) {
+        if (!window.wocStarted) {
+          showStartupError(
+            'Promise Error:\n' +
+            String(event.reason?.message || event.reason)
+          );
+        }
+      }
+    );
+
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const app = document.getElementById('app');
+
+        if (
+          app &&
+          app.textContent.includes('Loading Play Rummy')
+        ) {
+          showStartupError(
+            'The homepage did not initialize.\n' +
+            'Possible JavaScript syntax or startup error.\n' +
+            'Check public/app.js.'
+          );
+        }
+      }, 8000);
+    });
+  </script>
 
   <script type="module" src="/app.js"></script>
 </head>
+
 <body>
   <div id="app">
     <p class="loading">Loading Play Rummy…</p>
   </div>
+
   <div id="toast" role="status" aria-live="polite"></div>
   <div id="modal-root"></div>
 </body>
