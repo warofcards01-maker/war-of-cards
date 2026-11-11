@@ -208,8 +208,12 @@ async function handle(req,res,url,b) {
   if(route==='/api/join'&&method==='POST') {
     const u=await requireUser(req);if(u.role!=='customer')fail('Use a customer account to play.',403);limit(`join:${u.id}`,20);
     const t=tableById(b.tableId);if(!t||await q('SELECT 1 FROM disabled_tables WHERE id=?',t.id))fail('Table unavailable.');
-    const previous=[...games.values()].find(g=>g.status!=='finished'&&g.players.some(p=>p.id===u.id));
-    if(previous)return{game:viewGame(previous,u.id)};
+    const previous=[...games.values()].find(
+  g=>g.tableId===t.id &&
+     g.status!=='finished' &&
+     g.players.some(p=>p.id===u.id)
+);
+if(previous)return{game:viewGame(previous,u.id)};
     if(u.balance<t.stake*100)fail('LOW BALANCE');
     let g=[...games.values()].find(g=>g.tableId===t.id&&g.status!=='finished');
     if(g&&(g.status!=='waiting'||now()>=g.deadline-5000||g.players.length>=g.capacity))fail('Table is in progress. Choose another table.');
