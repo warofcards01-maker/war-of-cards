@@ -290,3 +290,13 @@
 .table-button.my-running-table strong {
   color: white !important;
 }
+.table-button.my-running-table {
+  background: #087c42 !important;
+  border: 2px solid #35ff91 !important;
+  color: white !important;
+  box-shadow: 0 0 12px #16c784;
+}
+
+.table-button.my-running-table strong {
+  color: white !important;
+}
