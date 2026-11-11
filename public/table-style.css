@@ -163,3 +163,120 @@
 .game-viewport .rummy-felt .hand-area { left: 18% !important; right: auto !important; width: 64% !important; top: 52% !important; bottom: auto !important; }
 .game-viewport .rummy-felt .table-center { left: 25% !important; right: 25% !important; top: 24% !important; bottom: auto !important; height: 26% !important; }
 .game-viewport .rummy-felt .action-help { display: none !important; }
+/* WAR OF CARDS — ORIGINAL TABLE IMAGE FIX */
+
+.game-viewport {
+  background: #000 !important;
+  overflow: hidden !important;
+}
+
+.game-viewport .game-content {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+/* Remove the extra oval and silver border */
+.game-viewport .rummy-felt {
+  position: relative !important;
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: none !important;
+  outline: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+
+  background-color: #000 !important;
+  background-image: url('/assets/rummy-table-bg.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+
+  overflow: visible !important;
+  transform: none !important;
+}
+
+.game-viewport .rummy-felt::before,
+.game-viewport .rummy-felt::after {
+  content: none !important;
+  display: none !important;
+}
+
+.game-viewport .felt-brand {
+  display: none !important;
+}
+
+/* Allow card and button interactions */
+.game-viewport .rummy-felt .opponents,
+.game-viewport .rummy-felt .my-seat,
+.game-viewport .rummy-felt .table-buttons {
+  pointer-events: none !important;
+}
+
+.game-viewport .rummy-felt .table-buttons .tb {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.game-viewport .rummy-felt .hand-area {
+  position: absolute !important;
+  left: 17% !important;
+  top: 52% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 66% !important;
+  max-width: none !important;
+  z-index: 20 !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+
+.game-viewport .hand-area .hand-cards {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  align-items: flex-end !important;
+  overflow: visible !important;
+  max-width: 100% !important;
+}
+
+.game-viewport .hand-area .hand-cards .playing-card {
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+}
+
+.game-viewport .rummy-felt .table-center {
+  position: absolute !important;
+  left: 32% !important;
+  right: 32% !important;
+  top: 28% !important;
+  height: 22% !important;
+  z-index: 15 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.game-viewport .rummy-felt .table-buttons {
+  z-index: 30 !important;
+}
+
+.game-viewport .rummy-felt .action-help {
+  display: none !important;
+}
