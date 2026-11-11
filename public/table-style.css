@@ -1,5 +1,6 @@
 /* =========================================
    RUMMY TABLE (picture: /assets/rummy-table-bg.png, 1616 x 973)
+   Everything is placed with percentages of the picture, so it always lines up.
    ========================================= */
 .game-viewport .rummy-felt {
   background: url('/assets/rummy-table-bg.png') no-repeat center center !important;
@@ -15,13 +16,10 @@
 .game-viewport .felt-brand { display: none !important; }
 .game-viewport { background-color: #000 !important; }
 
-/* =========================================
-   NAMES ON THE SEATS
-   Every seat sits exactly on a "Sit Here" circle of the picture; the name plate is right below it.
-   Positions are percentages of the table, taken from the picture.
-   ========================================= */
+/* ---------- Names on the seats ---------- */
 .game-viewport .rummy-felt .opponents,
-.game-viewport .rummy-felt .my-seat {
+.game-viewport .rummy-felt .my-seat,
+.game-viewport .rummy-felt .table-buttons {
   position: absolute !important;
   inset: 0 !important;
   display: block !important;
@@ -39,19 +37,19 @@
   box-shadow: none !important; transform: none !important;
   pointer-events: none !important;
 }
-.player-seat.seat-top-left  { --x: 21.97%; --y: 19.0%; }
-.player-seat.seat-top       { --x: 48.90%; --y: 19.0%; }
-.player-seat.seat-top-right { --x: 77.04%; --y: 19.0%; }
-.player-seat.seat-left      { --x: 14.73%; --y: 41.1%; }
-.player-seat.seat-right     { --x: 86.01%; --y: 41.1%; }
-.my-seat                    { --x: 73.50%; --y: 70.7%; }
+/* --x/--y = centre of the "Sit Here" circle, --w/--h = its size, --px = where the name plate is centred */
+.player-seat.seat-top-left  { --x: 7.92%;  --y: 15.93%; --w: 7.7%;  --h: 12.8%; --px: 9.5%; }
+.player-seat.seat-top       { --x: 47.15%; --y: 12.33%; --w: 8.0%;  --h: 13.4%; --px: 47.15%; }
+.player-seat.seat-top-right { --x: 85.27%; --y: 16.44%; --w: 7.7%;  --h: 12.7%; --px: 85.3%; }
+.player-seat.seat-left      { --x: 4.52%;  --y: 48.5%;  --w: 7.3%;  --h: 12.1%; --px: 7.5%; }
+.player-seat.seat-right     { --x: 93.44%; --y: 48.3%;  --w: 7.2%;  --h: 11.9%; --px: 90.5%; }
+.my-seat                    { --x: 83.17%; --y: 83.45%; --w: 7.55%; --h: 12.5%; --px: 83.2%; }
 
-/* circle that covers the "Sit Here" button of the picture */
 .game-viewport .rummy-felt .player-seat .avatar,
 .game-viewport .rummy-felt .my-seat .avatar {
   position: absolute !important;
   left: var(--x); top: var(--y);
-  width: 7.7% !important; height: 12.8% !important;
+  width: var(--w) !important; height: var(--h) !important;
   transform: translate(-50%, -50%) !important;
   display: flex !important; align-items: center !important; justify-content: center !important;
   border-radius: 50% !important;
@@ -62,10 +60,10 @@
   box-shadow: 0 3px 7px #000c !important;
   z-index: 2;
 }
-/* name plate under the circle */
-.game-viewport .rummy-felt .player-seat .seat-info-v2 {
+.game-viewport .rummy-felt .player-seat .seat-info-v2,
+.game-viewport .rummy-felt .my-seat .seat-info-v2 {
   position: absolute !important;
-  left: var(--x); top: calc(var(--y) + 6.8%);
+  left: var(--px); top: calc(var(--y) + var(--h) / 2 + 0.8%);
   transform: translateX(-50%) !important;
   display: flex !important; flex-direction: column !important; align-items: center !important; gap: 0 !important;
   min-width: 14%; max-width: 19%;
@@ -76,33 +74,17 @@
   text-align: center !important;
   z-index: 3;
 }
-.game-viewport .rummy-felt .player-seat .seat-info-v2 b {
+.game-viewport .rummy-felt .seat-info-v2 b {
   display: block !important; max-width: 100%;
   font-size: clamp(9px, 1.05vw, 14px) !important; line-height: 1.15 !important;
   color: #fff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.game-viewport .rummy-felt .player-seat .seat-info-v2 small {
+.game-viewport .rummy-felt .seat-info-v2 small {
   display: block !important; font-size: clamp(8px, .9vw, 12px) !important; line-height: 1.15 !important;
   color: #4dff7a !important; white-space: nowrap;
 }
-.game-viewport .rummy-felt .player-seat .seat-info-v2 small.turn-note { color: #fff !important; background: #12a150; border-radius: 3px; padding: 0 4px; margin-top: 1px; font-weight: 800; }
-.player-seat.out { opacity: .4; }
-
-/* my seat: the circle and the "Name" bar at the lower right of the picture */
-.game-viewport .rummy-felt .my-seat .seat-info-v2 {
-  position: absolute !important;
-  left: 77.2%; top: 67.2%;
-  display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 0 !important;
-  width: 10.8%; min-height: 7.4%;
-  padding: 2px 6px !important;
-  background: linear-gradient(#262626, #0c0c0c) !important;
-  border: 1px solid #9a9a9a !important; border-radius: 3px !important;
-  box-shadow: 0 2px 6px #000c !important;
-  z-index: 3;
-}
-.game-viewport .rummy-felt .my-seat .seat-info-v2 b { display: block !important; max-width: 100%; font-size: clamp(9px, 1.05vw, 14px) !important; line-height: 1.15 !important; color: #fff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.game-viewport .rummy-felt .my-seat .seat-info-v2 small { display: block !important; font-size: clamp(8px, .9vw, 12px) !important; line-height: 1.15 !important; color: #4dff7a !important; white-space: nowrap; }
-.game-viewport .rummy-felt .my-seat .seat-info-v2 small.turn-note { color: #fff !important; background: #12a150; border-radius: 3px; padding: 0 4px; font-weight: 800; }
+.game-viewport .rummy-felt .seat-info-v2 small.turn-note { color: #fff !important; background: #12a150; border-radius: 3px; padding: 0 4px; margin-top: 1px; font-weight: 800; }
+.player-seat.out, .my-seat.out { opacity: .4; }
 
 /* whose turn: green circle and green plate */
 .player-seat.turn .avatar, .my-seat.turn .avatar { border-color: #19ff6a !important; box-shadow: 0 0 0 3px #19ff6a88, 0 0 18px #19ff6a !important; }
@@ -124,9 +106,33 @@
 .fly-card.face span { position: absolute; left: 4px; top: 3px; font: bold 15px/1 Georgia, serif; display: flex; flex-direction: column; align-items: center; }
 .fly-card.face b { position: absolute; right: 5px; bottom: 4px; font-size: 22px; line-height: 1; }
 
-/* =========================================
-   CARDS & DECK
-   ========================================= */
+/* ---------- The buttons drawn in the picture are the real buttons ---------- */
+.game-viewport .rummy-felt .table-buttons .tb {
+  position: absolute !important; pointer-events: auto !important;
+  top: 82.8%; height: 5.9%;
+  margin: 0 !important; padding: 0 !important; min-height: 0 !important;
+  background: transparent !important; border: 0 !important; border-radius: 6px !important;
+  color: transparent !important; box-shadow: none !important; text-shadow: none !important;
+}
+/* wider touch area than the drawn button */
+.game-viewport .rummy-felt .table-buttons .tb::before { content: ''; position: absolute; inset: -7px -4px; }
+.game-viewport .rummy-felt .table-buttons .tb:disabled { background: rgba(0,0,0,.6) !important; opacity: 1 !important; }
+.game-viewport .rummy-felt .table-buttons .tb:not(:disabled):active { background: rgba(255,215,0,.3) !important; }
+.tb.tb-sort    { left: 24.2%; width: 8.5%; }
+.tb.tb-discard { left: 33.5%; width: 8.6%; }
+.tb.tb-drop    { left: 42.7%; width: 8.9%; }
+.tb.tb-group   { left: 52.2%; width: 9.0%; }
+/* the picture has no Declare button, so this one is drawn in the same style */
+.game-viewport .rummy-felt .table-buttons .tb.tb-declare {
+  left: 63.2%; width: 14.5%;
+  background: linear-gradient(#3b3b3b, #101010) !important;
+  border: 2px solid #f2b705 !important;
+  color: #fff !important; font-weight: 800 !important; font-size: clamp(8px, 1.05vw, 14px) !important; letter-spacing: .5px;
+  box-shadow: 0 0 8px #f2b70588 !important;
+}
+.game-viewport .rummy-felt .table-buttons .tb.tb-declare:disabled { background: linear-gradient(#262626, #0a0a0a) !important; color: #888 !important; border-color: #6d5a1a !important; box-shadow: none !important; }
+
+/* ---------- Cards ---------- */
 .playing-card {
   background: #ffffff !important; border: 1px solid #999 !important; color: #000000 !important;
   box-shadow: -2px 0 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3) !important;
@@ -153,5 +159,7 @@
 .game-viewport .hand-area .hand-cards .playing-card>i{position:absolute;top:auto;right:auto;left:2px;bottom:3px;font-size:9px;padding:1px 3px}
 .game-viewport .hand-area .hand-cards .playing-card.chosen{transform:translateY(-16px) !important;outline:3px solid #f6c453 !important;box-shadow:0 10px 20px rgba(0,0,0,0.6) !important;z-index:20 !important}
 
-/* my cards stay inside the table, left of my seat */
-.game-viewport .rummy-felt .hand-area { left: 3% !important; right: auto !important; width: 64% !important; bottom: 5% !important; }
+/* my cards and the deck stay inside the table */
+.game-viewport .rummy-felt .hand-area { left: 18% !important; right: auto !important; width: 64% !important; top: 52% !important; bottom: auto !important; }
+.game-viewport .rummy-felt .table-center { left: 25% !important; right: 25% !important; top: 24% !important; bottom: auto !important; height: 26% !important; }
+.game-viewport .rummy-felt .action-help { display: none !important; }
