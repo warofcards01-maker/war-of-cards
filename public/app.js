@@ -21,14 +21,123 @@ function nav(){if(!state.user||adminRoute)return'';return `<nav class="bottom-na
 function bonusCards(){const s=state.config.settings;return `<section class="bonuses"><div class="divider-title">BONUS / SPECIAL OFFERS</div><div class="bonus-grid">${[['Welcome Bonus',s.welcome,'welcome'],['Promo Code Bonus',s.promo,'promo'],['Losing Bonus',s.losing,'losing']].map(([name,p,id])=>`<button class="bonus-card" data-action="bonus" data-kind="${id}"><span>${name}</span><strong>${p}%</strong><small>View details ↗</small></button>`).join('')}</div></section>`;}
 function home(){return `<main class="landing"><section class="hero"><img class="hero-logo" src="/assets/brand-logo.png" alt="WAR OF CARDS — golden Ace and mounted warriors"><div class="world-badge">WORLD’S FIRST GAME</div><p class="hero-caption">Play Rummy, Win Money</p><div class="hero-actions">${button('LOG IN','login','','wine')}${button('SIGN UP','signup','','gold-button')}</div></section>${signupBox()}${bonusCards()}<section class="games-intro"><div class="divider-title">OUR GAMES</div><div class="intro-grid">${state.config.modes.map((m,i)=>`<button class="intro-card" data-action="login"><span class="suit">${['♠','♥','♣','♦'][i]}</span><div><h3>${E(m.name)}</h3><span>${E(m.sub)}</span></div><b>↗</b></button>`).join('')}</div></section><div class="support-strip">◉ &nbsp; 24/7 Customer Support ${button('Contact Support','support','','link-button')}</div><footer>18+ | Play Responsibly <a href="/admin">Admin</a></footer></main>`;}
 function signupBox(){const r=state.signup;if(!r)return'';return `<section class="signup-status panel"><p class="eyebrow">YOUR SIGN UP REQUEST</p><h3>${r.status==='pending'?'Your ID is being prepared':r.status==='approved'?'Your login is ready':'Request declined'}</h3><p>Requested ID: <b>${E(r.username)}</b> · Request ${E(r.id.slice(0,8))}</p>${r.status==='approved'?state.delivery?`<div class="credentials"><p>Login ID: <b>${E(state.delivery.username)}</b></p><p>Temporary Password: <code>${E(state.delivery.password)}</code></p><p class="muted">Save it now. These details can only be revealed once. Change the password at first login.</p>${button('LOG IN','login')}</div>`:button('Reveal login details once','reveal-login'):r.status==='pending'?'<p class="muted">Stay on this browser. The reply will appear here.</p>':'<p class="muted">Contact support for assistance.</p>'}</section>`;}
-function lobby(){const s=state.config,m=s.modes.find(m=>m.id===state.mode);return `<main class="app-main lobby-main"><section class="mode-tabs" aria-label="Game mode">${s.modes.map(m=>`<button class="mode-tab ${state.mode===m.id?'selected':''}" data-action="mode" data-mode="${m.id}"><span>${E(m.name)}</span><b>${E(m.sub)}</b></button>`).join('')}</section><div class="lobby-title"><div><h1>${E(m.name+' '+m.sub)}</h1><p>Select a table to join</p></div><span class="pill">80 Tables</span></div><div class="stake-list">${s.stakes.map(stake=>`<section class="stake-panel"><div class="stake-heading"><h2>₹${stake.toLocaleString('en-IN')}</h2><span>10 Tables</span></div>${[2,6].map(cap=>`<div class="seat-group"><h3>${cap} Players</h3><div class="table-grid">${[1,2,3,4,5].map(i=>{const id=`${state.mode}-${stake}-${cap}-${i}`,t=state.tables.find(t=>t.id===id),disabled=t?.disabled||(!t?.mine&&t?.status&&t.status!=='ready'&&t.status!=='waiting')
+function lobby(){const s=state.config,m=s.modes.find(m=>m.id===state.mode);return `<main class="app-main lobby-main"><section class="mode-tabs" aria-label="Game mode">${s.modes.map(m=>`<button class="mode-tab ${state.mode===m.id?'selected':''}" data-action="mode" data-mode="${m.id}"><span>${E(m.name)}</span><b>${E(m.sub)}</b></button>`).join('')}</section><div class="lobby-title"><div><h1>${E(m.name+' '+m.sub)}</h1><p>Select a table to join</p></div><span class="pill">80 Tables</span></div><div class="stake-list">${s.stakes.map(stake=>`<section class="stake-panel"><div class="stake-heading"><h2>₹${stake.toLocaleString('en-IN')}</h2><span>10 Tables</span></div>${[2,6].map(cap=>`<div class="seat-group"><h3>${cap} Players</h3><div class="table-grid">${[1,2,3,4,5].map(i=>{const id=`${state.mode}-${stake}-${cap}-${i}`,t=state.tables.find(t=>t.id===id),disabled=t?.disabled||(!t?.mine&&t?.status&&t.status!=='ready'&&t.status!=='waiting');
+return `<button class="table-button ${t?.mine?'my-running-table':cap===6?'wine':''}" data-action="${t?.mine?'rejoin':'join'}" data-id="${t?.mine&&t?.gameId?t.gameId:id}" ${disabled?'disabled':''}><span class="table-suit">${cap===6?'♥':'♠'}</span><b>T${i}</b><small>${t?.status==='waiting'?(t.players?.length||0)+'/'+cap:t?.mine?'Playing':disabled?'Paused':'Ready'}</small></button>`;}).join('')}</div></div>`).join('')}</section>`).join('')}</div></main>`;}
 function history(){return `<main class="app-main">${heading('YOUR TABLE JOURNEY','My Games','Active tables and recent results.')}<div class="history-list">${state.history.length?state.history.map(g=>`<article class="history-card"><span class="history-suit">♠</span><div><h3>${E(g.tableId)}</h3><p class="muted">${date(g.created)} · ${money(g.stake*100)} · Round ${g.round||0}</p></div><span class="pill">${g.cancelled?'Refunded':g.status==='finished'?g.tie?'Draw — refunded':g.won?'Won':'Lost':E(g.status)}</span>${button(g.status==='finished'?'View':'Rejoin','rejoin',`data-id="${g.id}"`,'small primary')}</article>`).join(''):'<div class="empty panel"><h2>Your first table awaits</h2><p class="muted">Your games will appear here.</p>'+button('Explore Games','nav','data-page="lobby"')+'</div>'}</div></main>`;}
 function wallet(){const w=state.wallet;if(!w)return '<main class="app-main">Loading wallet…</main>';const s=state.config.settings;return `<main class="app-main">${heading('YOUR ACCOUNT','Wallet')}<section class="balance-card"><span>Available Balance</span><strong>${money(w.user.balance)}</strong><div>${button('Deposit','deposit')}${button('Withdraw','withdraw','','wine')}</div></section><section class="panel loss-panel"><div><h3>Losing Bonus ${s.losing}%</h3><p class="muted">Net settled losses: ${money(w.user.lossProgress)} / ${money(s.lossThreshold*100)}</p></div>${button('Claim Bonus','claim-losing',w.user.lossProgress<s.lossThreshold*100?'disabled':'','small primary')}</section><h2>Requests</h2><div class="list">${w.requests.length?w.requests.map(r=>`<article class="list-row"><div><b>${E(r.kind)}</b><small>${date(r.created)}</small></div><strong>${money(r.amount)}</strong><span class="pill">${E(r.status)}</span></article>`).join(''):'<p class="muted">No requests yet.</p>'}</div><h2>Transactions</h2><div class="list">${w.ledger.length?w.ledger.map(l=>`<article class="list-row"><div><b>${E(l.kind.replaceAll('_',' '))}</b><small>${date(l.created)} · ${E(l.note)}</small></div><strong class="${l.amount>0?'positive':''}">${l.amount>0?'+':''}${money(l.amount)}</strong></article>`).join(''):'<p class="muted">No transactions yet.</p>'}</div></main>`;}
 function support(){return `<main class="app-main">${heading('HERE TO HELP','Customer Support')}<section class="panel"><h2>24/7 Customer Support</h2>${state.config.settings.support?`<p>Support number: <b>${E(state.config.settings.support)}</b></p>`:'<p class="muted">The administrator has not added a support number yet.</p>'}<p>For account requests, share the first eight characters of your request number. Never share your password.</p>${button('Rules','rules','','wine')}</section></main>`;}
 function render(){if(!state.config)return;document.body.classList.toggle('in-game',!!state.game);if(state.game){$('#app').innerHTML=gameScreen();return;}if(adminRoute){$('#app').innerHTML=adminScreen();return;}$('#app').innerHTML=header()+(state.user?({lobby,history,wallet,support,tournaments,tournamentDetail}[state.page]||lobby)():state.page==='support'?support():home())+nav();}
 const rank=r=>({1:'A',11:'J',12:'Q',13:'K'}[r]||r);
 const suit=s=>({S:'♠',H:'♥',D:'♦',C:'♣',J:'★'}[s]);
-function card(c,clickable=false,extra=''){return `<${clickable?'button':'div'} class="playing-card ${['H','D'].includes(c.suit)?'red':''} ${state.selected.includes(c.id)?'chosen':''} ${extra}" ${clickable?`data-action="select-card" data-id="${E(c.id)}"`:''} aria-label="${c.rank?rank(c.rank)+' '+suit(c.suit):'Joker'}"><span>${c.rank?rank(c.rank):'J'}<small>${suit(c.suit)}</small></span><b>${suit(c.suit)}</b>${c.rank===state.game?.wild?'<i>W</i>':''}</${clickable?'button':'div'}>`;}
+function card(c,clickable=false,extra=''){return `<${clickable?'button':'div'} class="playing-card ${['H','D'].includes(c.suit)?'red':''} ${state.selected.includes(c.id)?'chosen':''} ${extra}" ${clickable?`data-action="select-card" data-id="${E(c.id)}" draggable="false"`:''} aria-label="${c.rank?rank(c.rank)+' '+suit(c.suit):'Joker'}"><span>${c.rank?rank(c.rank):'J'}<small>${suit(c.suit)}</small></span><b>${suit(c.suit)}</b>${c.rank===state.game?.wild?'<i>W</i>':''}</${clickable?'button':'div'}>`;}
+
+// Remember the player's preferred card order
+let savedCardOrder = [];
+
+function rememberCardOrder(hand) {
+  savedCardOrder = hand.map(c => c.id);
+}
+
+function restoreCardOrder(hand) {
+  if (!Array.isArray(hand) || !savedCardOrder.length) {
+    return hand;
+  }
+
+  const positions = new Map(
+    savedCardOrder.map((id, index) => [id, index])
+  );
+
+  return [...hand].sort((a, b) => {
+    const ai = positions.has(a.id)
+      ? positions.get(a.id)
+      : 9999;
+
+    const bi = positions.has(b.id)
+      ? positions.get(b.id)
+      : 9999;
+
+    return ai - bi;
+  });
+}
+
+// Mobile touch: reorder cards in the player's hand
+let cardDrag = null;
+let suppressCardClick = false;
+
+document.addEventListener('pointerdown', e => {
+  const el = e.target.closest('.hand-cards .playing-card');
+  if (!el || !state.game || e.button !== 0) return;
+
+  cardDrag = {
+    id: el.dataset.id,
+    startX: e.clientX,
+    startY: e.clientY,
+    moved: false
+  };
+});
+
+document.addEventListener('pointermove', e => {
+  if (!cardDrag) return;
+
+  const distance = Math.hypot(
+    e.clientX - cardDrag.startX,
+    e.clientY - cardDrag.startY
+  );
+
+  if (distance > 12) {
+    cardDrag.moved = true;
+
+    document
+      .querySelectorAll('.hand-cards .playing-card')
+      .forEach(el => {
+        el.classList.toggle(
+          'dragging',
+          el.dataset.id === cardDrag.id
+        );
+      });
+  }
+});
+
+document.addEventListener('pointerup', e => {
+  if (!cardDrag) return;
+
+  document
+    .querySelectorAll('.hand-cards .playing-card.dragging')
+    .forEach(el => el.classList.remove('dragging'));
+
+  const drag = cardDrag;
+  cardDrag = null;
+
+  if (!drag.moved) return;
+
+  suppressCardClick = true;
+
+  const target = document
+    .elementFromPoint(e.clientX, e.clientY)
+    ?.closest('.hand-cards .playing-card');
+
+  if (!target || target.dataset.id === drag.id) return;
+
+  const hand = state.game?.players
+    .find(p => p.id === state.user.id)?.hand;
+
+  if (!hand) return;
+
+  const from = hand.findIndex(c => c.id === drag.id);
+  const to = hand.findIndex(c => c.id === target.dataset.id);
+
+  if (from < 0 || to < 0) return;
+
+  const [moving] = hand.splice(from, 1);
+  hand.splice(to, 0, moving);
+  rememberCardOrder(hand);
+
+  render();
+});
+
+document.addEventListener('pointercancel', () => {
+  cardDrag = null;
+}, true);
 
 function tournaments(){const list=state.tourList;return `<main class="app-main tournament-main">${heading('SIX DAILY START TIMES · IST','Tournaments','06:00 · 09:00 · 12:00 · 15:00 · 18:00 · 21:00')}<div class="tournament-tabs">${button('Today','tour-date','data-date="today"',state.tourDate==='today'?'primary':'ghost')}${button('Tomorrow · Book Ahead','tour-date','data-date="tomorrow"',state.tourDate==='tomorrow'?'primary':'ghost')}</div><p class="muted">Three tournaments start together at every time. Booking closes 10 minutes before start. Empty seats then fill with clearly labelled Computer players.</p>${list?list.events.map(e=>`<article class="tournament-card panel"><div class="tournament-card-top"><div><h2>${E(e.name)}</h2><p>${date(e.start)} IST</p></div><span class="pill">${E(e.status)}</span></div><div class="tournament-numbers"><div><small>Entry</small><b>${money(e.fee*100)}</b></div><div><small>Prize Pool</small><b>${money(e.totalPrize*100)}</b></div><div><small>Seats</small><b>${e.joined}/${e.capacity}</b></div></div><p class="muted">${e.humanCount} Players · ${e.computerCount} Computers · Closes ${date(e.closes)} IST</p>${button(e.mine?'My Booking / Enter':'View / Book','tour-detail',`data-id="${E(e.id)}"`)}${e.mine?'<span class="pill">Booked</span>':''}</article>`).join(''):'Loading tournaments…'}</main>`;}
 async function openTournament(id){state.tourId=id;state.boardPage=0;state.tourDetail=await api('/api/tournament?id='+encodeURIComponent(id));state.page='tournamentDetail';render();}
@@ -59,7 +168,7 @@ function rectCenter(el){if(!el)return null;const r=el.getBoundingClientRect();re
 function flyCard(from,to,face,delay=0){
   if(!from||!to||!document.body||typeof document.body.animate!=='function')return;
   const w=46,h=64,el=document.createElement('div');
-  el.className='fly-card'+(face?' face'+(['H','D'].includes(face.suit)?' red':''):'');
+  el.className='fly-card'+(face?' face'+(['H','D'].includes(face.suit)?' red':''));
   if(face)el.innerHTML=`<span>${face.rank?rank(face.rank):'J'}<small>${suit(face.suit)}</small></span><b>${suit(face.suit)}</b>`;
   el.style.width=w+'px';el.style.height=h+'px';document.body.appendChild(el);
   const rot=state.manual?90:0,pos=(p,dy=0)=>`translate(${p.x-w/2}px,${p.y-h/2+dy}px) rotate(${rot}deg)`;
@@ -132,7 +241,7 @@ function loginModal(){showModal('Log In',`<form data-form="login">${field('Login
 function signupModal(){showModal('Request Your ID',`<p class="muted">Submit your details. Your login will appear in your request box after admin approval.</p><form data-form="signup">${field('Full name','name','text','','required minlength="2" maxlength="80" autocomplete="name"')}${field('Mobile number','mobile','tel','','required pattern="[0-9]{10}" maxlength="10" autocomplete="tel-national"')}${field('Choose User ID','username','text','','required pattern="[a-zA-Z0-9_]{4,24}" autocomplete="username"')}<label class="check"><input type="checkbox" required> I am 18 or older.</label><button>Submit Request</button><p class="form-message" role="alert"></p></form>`);}
 async function loadAdmin(){state.admin=await api('/api/admin/state');state.tourAdmin=await api('/api/admin/tournaments');}
 async function navigate(page){state.page=page;if(page==='tournaments')state.tourList=await api('/api/tournaments?date='+state.tourDate);if(page==='lobby')state.tables=(await api('/api/tables')).tables;if(page==='history')state.history=(await api('/api/my-games')).games;if(page==='wallet'){state.wallet=await api('/api/wallet');state.user=state.wallet.user;}render();}
-async function loadGame(id){state.game=(await api('/api/game?id='+encodeURIComponent(id))).game;state.selected=[];state.groupOf={};state.manual=matchMedia('(orientation: portrait)').matches;render();}
+async function loadGame(id){state.game=(await api('/api/game?id='+encodeURIComponent(id))).game;savedCardOrder=[];state.selected=[];state.groupOf={};state.manual=matchMedia('(orientation: portrait)').matches;render();}
 async function gameAction(action,extra={}){const r=await api('/api/game-action',{gameId:state.game.id,action,actionId:crypto.randomUUID(),...extra});if(r.left){state.game=null;await navigate('lobby');}else{const oldH=state.game.players.find(p=>p.id===state.user.id)?.hand,newH=r.game.players.find(p=>p.id===state.user.id)?.hand;if(oldH&&newH)newH.sort((a,b)=>{const x=oldH.findIndex(c=>c.id===a.id),y=oldH.findIndex(c=>c.id===b.id);return(x<0?999:x)-(y<0?999:y);});const prevG=state.game;state.game=r.game;if(!r.penalty)state.selected=[];render();playFx(prevG,state.game);if(r.penalty)toast(r.message);}}
 function waLink(){let n=String(state.config.settings.support||'').replace(/\D/g,'');if(n.length===10)n='91'+n;else if(n.length===11&&n[0]==='0')n='91'+n.slice(1);return n.length>=11?'https://wa.me/'+n+'?text='+encodeURIComponent('Hello, I need help with my deposit.'):'';}
 function waBox(){return `<section class="panel wa-box"><p class="muted">Need help with your deposit? Chat with us on WhatsApp.</p>${button('<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#25D366"/><path d="M7.5 16.5l.9-2.7a5 5 0 1 1 1.8 1.8z" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 9.5c.3 2 2 3.7 4 4l.9-.9-1.4-.8-.6.5c-.9-.4-1.5-1-1.9-1.9l.5-.6-.8-1.4z" fill="#fff"/></svg> WhatsApp Chat','whatsapp-chat','','primary')}</section>`;}
@@ -160,11 +269,19 @@ rules:()=>showModal('Rummy Rules',`<div class="rules"><p>Each player receives 13
 'claim-losing':async()=>{await api('/api/claim-losing',{});await navigate('wallet');toast('Losing bonus added.');},
 sound:()=>{sfx.toggle();render();},
 'whatsapp-chat':()=>{const l=waLink();if(!l){toast('WhatsApp number has not been added by the admin yet.');return;}window.open(l,'_blank','noopener');},
-join:async el=>{const r=await api('/api/join',{tableId:el.dataset.id});state.game=r.game;state.groupOf={};state.manual=matchMedia('(orientation: portrait)').matches;render();},rejoin:el=>loadGame(el.dataset.id),
+join:async el=>{const r=await api('/api/join',{tableId:el.dataset.id});state.game=r.game;savedCardOrder=[];state.selected=[];state.groupOf={};state.manual=matchMedia('(orientation: portrait)').matches;render();},rejoin:el=>loadGame(el.dataset.id),
 'select-card':el=>{const id=el.dataset.id;state.selected=state.selected.includes(id)?state.selected.filter(x=>x!==id):[...state.selected,id];render();},draw:el=>gameAction('draw',{source:el.dataset.source}),discard:()=>gameAction('discard',{cardId:state.selected[0]}),declare:()=>gameAction('declare',{cardId:state.selected[0]}),drop:()=>showModal('Drop this round?',`<p>You remain in the game series with a drop penalty.</p>${button('Confirm Drop','confirm-drop','','wine')}`),'confirm-drop':async()=>{closeModal();await gameAction('drop');},
-'sort-cards':()=>{const hand=state.game.players.find(p=>p.id===state.user.id)?.hand;if(hand){hand.sort((a,b)=>a.suit.localeCompare(b.suit)||a.rank-b.rank);state.groupOf={};const ids={C:1,D:2,H:3,J:4,S:5};for(const c of hand)state.groupOf[c.id]=ids[c.suit]||6;}state.selected=[];render();},
-'group-cards':()=>{const me=state.game.players.find(p=>p.id===state.user.id);if(!me?.hand||state.selected.length<2)return;const sel=me.hand.filter(c=>state.selected.includes(c.id));const first=me.hand.findIndex(c=>state.selected.includes(c.id));const rest=me.hand.filter(c=>!state.selected.includes(c.id));rest.splice(first,0,...sel);me.hand=rest;const gid=Date.now();for(const c of sel)state.groupOf[c.id]=gid;state.selected=[];render();},
-'leave-game':async()=>{if(state.game.status==='waiting')return gameAction('leave');const tid=state.game?.tournamentId;state.game=null;state.manual=false;if(tid)return openTournament(tid);await navigate('lobby');},
+'sort-cards':()=>{const hand=state.game.players.find(p=>p.id===state.user.id)?.hand;if(hand){hand.sort((a,b)=>a.suit.localeCompare(b.suit)||a.rank-b.rank);state.groupOf={};const ids={C:1,D:2,H:3,J:4,S:5};for(const c of hand)state.groupOf[c.id]=ids[c.suit]||6;}if(hand)rememberCardOrder(hand);
+state.selected=[];render();},
+'group-cards':()=>{const me=state.game.players.find(p=>p.id===state.user.id);if(!me?.hand||state.selected.length<2)return;const sel=me.hand.filter(c=>state.selected.includes(c.id));const first=me.hand.findIndex(c=>state.selected.includes(c.id));const rest=me.hand.filter(c=>!state.selected.includes(c.id));rest.splice(first,0,...sel);me.hand=rest;rememberCardOrder(me.hand);const gid=Date.now();for(const c of sel)state.groupOf[c.id]=gid;state.selected=[];render();},
+'leave-game':async()=>{
+  const tid=state.game?.tournamentId;
+  state.game=null;
+  savedCardOrder=[];
+  state.manual=false;
+  if(tid)return openTournament(tid);
+  await navigate('lobby');
+},
 'close-game':async()=>{const tid=state.game?.tournamentId;state.game=null;state.manual=false;state.user=(await api('/api/me')).user;if(tid)return openTournament(tid);await navigate('lobby');},
 rotate:async()=>{if(state.manual){state.manual=false;render();return;}try{await document.documentElement.requestFullscreen();await screen.orientation.lock('landscape');state.manual=false;}catch{state.manual=matchMedia('(orientation: portrait)').matches;toast('Rotate your phone, or use the rotated table view.');}render();},
 'admin-tab':el=>{state.adminTab=el.dataset.tab;render();},'admin-refresh':async()=>{await loadAdmin();render();},
@@ -176,7 +293,28 @@ decide:el=>showModal('Confirm Request Decision',`<p>${el.dataset.decision==='app
 'cancel-game':el=>showModal('Cancel Game',`<p>End the game and refund any debited human entries?</p>${button('Cancel & Refund','confirm-cancel',`data-id="${el.dataset.id}"`,'wine')}`),
 'confirm-cancel':async el=>{await api('/api/admin/cancel-game',{gameId:el.dataset.id});closeModal();await loadAdmin();render();}
 };
-document.addEventListener('click',async e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled||state.busy)return;const fn=actions[el.dataset.action];if(!fn)return;state.busy=true;try{await fn(el);}catch(err){toast(err.message);}finally{state.busy=false;}});
+document.addEventListener('click',async e=>{
+  if(suppressCardClick){
+    suppressCardClick=false;
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
+  const el=e.target.closest('[data-action]');
+  if(!el||el.disabled||state.busy)return;
+  const fn=actions[el.dataset.action];
+  if(!fn)return;
+
+  state.busy=true;
+  try{
+    await fn(el);
+  }catch(err){
+    toast(err.message);
+  }finally{
+    state.busy=false;
+  }
+});
 function fileData(file){return new Promise((resolve,reject)=>{if(!file||!file.size)return resolve('');if(file.size>2*1024*1024)return reject(Error('Image must be less than 2 MB.'));const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('Could not read image.'));r.readAsDataURL(file);});}
 document.addEventListener('submit',async e=>{const form=e.target.closest('form[data-form]');if(!form)return;e.preventDefault();if(state.busy)return;const b=Object.fromEntries(new FormData(form)),kind=form.dataset.form,msg=form.querySelector('.form-message'),submit=form.querySelector('button[type="submit"],button:not([type])');state.busy=true;if(submit)submit.disabled=true;try{
 if(kind==='tour-fund'){const amount=Math.round(Number(b.amount)*100);if(!Number.isSafeInteger(amount)||amount===0)throw Error('Enter a non-zero amount.');await api('/api/admin/tournament-action',{action:'fund-adjust',amount,note:b.note});await loadAdmin();render();toast('Prize reserve updated.');}
@@ -199,7 +337,22 @@ matchMedia('(orientation: portrait)').addEventListener('change',()=>{state.manua
 setInterval(()=>document.querySelectorAll('[data-countdown]').forEach(el=>el.textContent=Math.max(0,Math.ceil((Number(el.dataset.countdown)-Date.now())/1000))),250);
 let polling=false;
 setInterval(async()=>{if(polling||state.busy||document.hidden)return;polling=true;try{
-if(state.game&&!state.modal){const requestedId=state.game.id;const packet=await api('/api/game?id='+encodeURIComponent(requestedId));const g=packet.game;if(packet.user)state.user=packet.user;if(state.game?.id!==requestedId)return;const before=JSON.stringify(state.game);if(JSON.stringify(g)!==before){const hand=state.game.players.find(p=>p.id===state.user.id)?.hand;const incoming=g.players.find(p=>p.id===state.user.id)?.hand;if(hand&&incoming)incoming.sort((a,b)=>{const ai=hand.findIndex(c=>c.id===a.id),bi=hand.findIndex(c=>c.id===b.id);return(ai<0?999:ai)-(bi<0?999:bi);});const prevG=state.game;state.game=g;state.selected=state.selected.filter(id=>incoming?.some(c=>c.id===id));render();playFx(prevG,g);}}
+if(state.game&&!state.modal){const requestedId=state.game.id;const packet=await api('/api/game?id='+encodeURIComponent(requestedId));const g=packet.game;if(packet.user)state.user=packet.user;if(state.game?.id!==requestedId)return;const before=JSON.stringify(state.game);if(JSON.stringify(g)!==before){const hand=state.game.players.find(p=>p.id===state.user.id)?.hand;const incoming=g.players.find(p=>p.id===state.user.id)?.hand;if (hand && incoming) {
+  const order = savedCardOrder.length
+    ? savedCardOrder
+    : hand.map(c => c.id);
+
+  const positions = new Map(
+    order.map((id, index) => [id, index])
+  );
+
+  incoming.sort((a, b) =>
+    (positions.get(a.id) ?? 9999) -
+    (positions.get(b.id) ?? 9999)
+  );
+
+  rememberCardOrder(incoming);
+}const prevG=state.game;state.game=g;state.selected=state.selected.filter(id=>incoming?.some(c=>c.id===id));render();playFx(prevG,g);}}
 else if(state.user&&!adminRoute&&state.page==='lobby'&&!state.modal&&Date.now()-(state.tableRefresh||0)>5000){state.tableRefresh=Date.now();const tables=(await api('/api/tables')).tables;if(!state.game&&state.page==='lobby'){state.tables=tables;render();}}
 else if(state.user&&!adminRoute&&['tournaments','tournamentDetail'].includes(state.page)&&!state.modal&&Date.now()-(state.tourRefresh||0)>4000){state.tourRefresh=Date.now();if(state.page==='tournaments'){state.tourList=await api('/api/tournaments?date='+state.tourDate);}else state.tourDetail=await api('/api/tournament?id='+encodeURIComponent(state.tourId));if(!state.game)render();}
 else if(!state.user&&state.signup?.status==='pending'&&!state.modal){const r=(await api('/api/signup-status')).request;if(r?.status!==state.signup.status){state.signup=r;render();}}
