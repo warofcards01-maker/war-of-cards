@@ -202,8 +202,26 @@ async function handle(req,res,url,b) {
     return tx(async()=>{const r=await q('SELECT * FROM signups WHERE token=?',hash(cookie(req,'pr_signup')||''));if(!r||r.status!=='approved'||!r.delivery)fail('No unclaimed login details available.',404);const password=decrypt(r.delivery);await run('UPDATE signups SET delivery=NULL WHERE id=?',r.id);return{username:r.username,password};});
   }
   if(route==='/api/tables'&&method==='GET') {
-    await requireUser(req);const disabled=new Set((await all('SELECT id FROM disabled_tables')).map(x=>x.id));
-    return{tables:TABLES.map(t=>{const g=[...games.values()].find(g=>g.tableId===t.id&&g.status!=='finished');return {...t,disabled:disabled.has(t.id),status:g?.status||'ready',occupancy:g?.players.length||0,gameId:g?.id};})};
+    const u = await requireUser(req);
+const disabled = new Set(
+  (await all('SELECT id FROM disabled_tables')).map(x => x.id)
+);
+    return {
+  tables: TABLES.map(t => {
+    const g = [...games.values()].find(
+      x => x.tableId === t.id && x.status !== 'finished'
+    );
+
+    return {
+      ...t,
+      disabled: disabled.has(t.id),
+      status: g?.status || 'ready',
+      occupancy: g?.players.length || 0,
+      gameId: g?.id || null,
+      mine: !!g?.players.some(p => p.id === u.id)
+    };
+  })
+};
   }
   if(route==='/api/join'&&method==='POST') {
     const u=await requireUser(req);if(u.role!=='customer')fail('Use a customer account to play.',403);limit(`join:${u.id}`,20);
